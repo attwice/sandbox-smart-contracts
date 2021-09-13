@@ -10,16 +10,19 @@ import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/acce
 
 // This contract is final, don't inherit form it.
 contract PolygonAvatarSale is PolygonAvatarSaleStorage {
-    function initialize(IAvatarMinter polygonAvatarAddress_, IERC20Upgradeable sandTokenContractAddress_)
-        external
-        initializer
-    {
+    function initialize(
+        IAvatarMinter polygonAvatarAddress_,
+        IERC20Upgradeable sandTokenContractAddress_,
+        address trustedForwarder_,
+        address defaultAdmin_,
+        address storageChanger_
+    ) external initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
-        __UpgradeableBase_init_unchained();
+        __UpgradeableBase_init_unchained(defaultAdmin_, storageChanger_);
         __EIP712_init_unchained(name, version);
-
+        __ERC2771Handler_initialize(trustedForwarder_);
         polygonAvatarAddress = polygonAvatarAddress_;
         sandTokenContractAddress = sandTokenContractAddress_;
     }
@@ -48,7 +51,7 @@ contract PolygonAvatarSale is PolygonAvatarSaleStorage {
         uint256 price
     ) external payable {
         require(_verify(v, r, s, signer, buyer, id, seller, price), "Invalid signature");
-        require(hasRole(SIGNER_ROLE, signer), "Invalid seller");
+        require(hasRole(SIGNER_ROLE, signer), "Invalid signer");
         require(hasRole(SELLER_ROLE, seller), "Invalid seller");
         polygonAvatarAddress.mint(buyer, id);
         require(sandTokenContractAddress.transferFrom(buyer, address(this), price), "TransferFrom failed");

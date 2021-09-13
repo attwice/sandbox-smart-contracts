@@ -5,7 +5,14 @@ import {defaultAbiCoder} from 'ethers/lib/utils';
 
 const setupTest = deployments.createFixture(async function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, deployer, upgradeAdmin] = await getUnnamedAccounts();
+  const [
+    _,
+    deployer,
+    upgradeAdmin,
+    adminRole,
+    storageChanger,
+    other,
+  ] = await getUnnamedAccounts();
   await deployments.deploy('UpgradeableMock', {
     from: deployer,
     proxy: {
@@ -13,12 +20,19 @@ const setupTest = deployments.createFixture(async function () {
       proxyContract: 'OptimizedTransparentProxy',
       execute: {
         methodName: 'initialize',
-        args: [123],
+        args: [123, adminRole, storageChanger],
       },
     },
   });
-  const upgradeableMock = await ethers.getContract('UpgradeableMock');
-  return {upgradeableMock, deployer, upgradeAdmin};
+  const upgradeableMock = await ethers.getContract('UpgradeableMock', deployer);
+  return {
+    upgradeableMock,
+    deployer,
+    upgradeAdmin,
+    adminRole,
+    storageChanger,
+    other,
+  };
 });
 describe('Upgradeable storage change mechanism', function () {
   before(async function () {
@@ -29,7 +43,10 @@ describe('Upgradeable storage change mechanism', function () {
     // }
     // We need to erase this.db.deployments so the proxyAdmin is re-deployed
     // This does the trick
-    await deployments.run([], {resetMemory: true});
+    await deployments.fixture([], {
+      fallbackToGlobal: false,
+      keepExistingDeployments: false,
+    });
   });
   it('initialization', async function () {
     const fixtures = await setupTest();
@@ -52,10 +69,17 @@ describe('Upgradeable storage change mechanism', function () {
     });
     const storageChangeMock = await ethers.getContract('StorageChangeMock');
 
-    const authorizedChanger = fixtures.deployer;
+    // deployer must fail to callChanger
+    await expect(
+      fixtures.upgradeableMock.callChanger(
+        storageChangeMock.address,
+        defaultAbiCoder.encode(['uint'], [654])
+      )
+    ).to.be.revertedWith('not authorized storageChanger');
+
     const upgradeableMockAsAuthorizedChanger = await ethers.getContract(
       'UpgradeableMock',
-      authorizedChanger
+      fixtures.storageChanger
     );
     await upgradeableMockAsAuthorizedChanger.callChanger(
       storageChangeMock.address,
@@ -70,5 +94,43 @@ describe('Upgradeable storage change mechanism', function () {
     expect(await fixtures.upgradeableMock.getAVal()).to.be.equal(
       BigNumber.from(654 + 20)
     );
+  });
+
+  it('roles', async function () {
+    const fixtures = await setupTest();
+    const storageChangerRole = await fixtures.upgradeableMock.STORAGE_CHANGER_ROLE();
+    expect(
+      await fixtures.upgradeableMock.hasRole(
+        storageChangerRole,
+        fixtures.storageChanger
+      )
+    ).to.be.true;
+    expect(
+      await fixtures.upgradeableMock.hasRole(storageChangerRole, fixtures.other)
+    ).to.be.false;
+    const defaultAdminRole = await fixtures.upgradeableMock.DEFAULT_ADMIN_ROLE();
+    expect(
+      await fixtures.upgradeableMock.hasRole(
+        defaultAdminRole,
+        fixtures.adminRole
+      )
+    ).to.be.true;
+    expect(
+      await fixtures.upgradeableMock.hasRole(defaultAdminRole, fixtures.other)
+    ).to.be.false;
+
+    await expect(
+      fixtures.upgradeableMock.grantRole(storageChangerRole, fixtures.other)
+    ).to.be.revertedWith('AccessControl: sender must be an admin to grant');
+
+    const upgradeableMockAsAdmin = await ethers.getContract(
+      'UpgradeableMock',
+      fixtures.adminRole
+    );
+    await upgradeableMockAsAdmin.grantRole(storageChangerRole, fixtures.other);
+
+    expect(
+      await fixtures.upgradeableMock.hasRole(storageChangerRole, fixtures.other)
+    ).to.be.true;
   });
 });

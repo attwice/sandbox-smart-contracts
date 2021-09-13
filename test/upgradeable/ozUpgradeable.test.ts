@@ -4,7 +4,14 @@ import {expect} from 'chai';
 
 const setupTest = deployments.createFixture(async function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, deployer, upgradeAdmin, other] = await getUnnamedAccounts();
+  const [
+    _,
+    deployer,
+    upgradeAdmin,
+    adminRole,
+    storageChanger,
+    other,
+  ] = await getUnnamedAccounts();
   await deployments.deploy('UpgradeableMock', {
     from: deployer,
     proxy: {
@@ -12,7 +19,7 @@ const setupTest = deployments.createFixture(async function () {
       proxyContract: 'OpenZeppelinTransparentProxy',
       execute: {
         methodName: 'initialize',
-        args: [123],
+        args: [123, adminRole, storageChanger],
       },
     },
   });
@@ -45,7 +52,10 @@ describe('OpenZeppelinTransparentProxy explanation', function () {
     // }
     // We need to erase this.db.deployments so the proxyAdmin is re-deployed
     // This does the trick
-    await deployments.run([], {resetMemory: true});
+    await deployments.fixture([], {
+      fallbackToGlobal: false,
+      keepExistingDeployments: false,
+    });
   });
   it('there is no way to call directly the admin operations on the proxy', async function () {
     const fixtures = await setupTest();

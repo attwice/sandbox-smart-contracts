@@ -5,11 +5,15 @@ pragma solidity 0.8.2;
 import {UpgradeableStorageMock} from "./UpgradeableStorageMock.sol";
 
 contract UpgradeableMock is UpgradeableStorageMock {
-    function initialize(uint256 initialValue_) external initializer {
+    function initialize(
+        uint256 initialValue_,
+        address adminRole_,
+        address storageChanger_
+    ) external initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
-        __UpgradeableBase_init_unchained();
+        __UpgradeableBase_init_unchained(adminRole_, storageChanger_);
         someValue1 = initialValue_;
         someValue2 = 12;
     }

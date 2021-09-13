@@ -30,18 +30,16 @@ abstract contract Upgradeable is Initializable, ContextUpgradeable, AccessContro
         _;
     }
 
-    function __UpgradeableBase_init() internal initializer {
+    function __UpgradeableBase_init(address adminRole, address storageChanger) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
-        __UpgradeableBase_init_unchained();
+        __UpgradeableBase_init_unchained(adminRole, storageChanger);
     }
 
-    function __UpgradeableBase_init_unchained() internal initializer {
-        // The initial authorized changer is the deployer and he is also the admin role!!!
-        // TODO: check if this is enough/ok, maybe is a little bit limited!!!!
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        _setupRole(STORAGE_CHANGER_ROLE, _msgSender());
+    function __UpgradeableBase_init_unchained(address adminRole, address storageChanger) internal initializer {
+        _setupRole(DEFAULT_ADMIN_ROLE, adminRole);
+        _setupRole(STORAGE_CHANGER_ROLE, storageChanger);
     }
 
     // This is very risky but we assume that we have full control over the changers!!!
