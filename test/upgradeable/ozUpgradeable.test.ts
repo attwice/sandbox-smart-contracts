@@ -3,8 +3,8 @@ import {BigNumber} from 'ethers';
 import {expect} from 'chai';
 
 const setupTest = deployments.createFixture(async function () {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _,
     deployer,
     upgradeAdmin,

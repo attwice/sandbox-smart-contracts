@@ -4,8 +4,8 @@ import {expect} from 'chai';
 import {defaultAbiCoder} from 'ethers/lib/utils';
 
 const setupTest = deployments.createFixture(async function () {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _,
     deployer,
     upgradeAdmin,
