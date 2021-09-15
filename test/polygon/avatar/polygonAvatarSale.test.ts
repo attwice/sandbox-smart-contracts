@@ -58,14 +58,15 @@ describe('PolygonAvatarSale.sol', function () {
   });
 
   describe('mint', function () {
-    it('should success to mint when a message is signed by signer and has destination to a valid seller', async function () {
+    it('should be able to mint', async function () {
       const fixtures = await setupAvatarSaleTest();
       const buyer = fixtures.dest;
       const tokenId = BigNumber.from(0x123);
+      const price = toWei(5);
       await mintSandAndApprove(
         fixtures.sandToken,
         buyer,
-        toWei(10),
+        price,
         fixtures.polygonAvatarSaleAsOther.address
       );
       const preSeller = BigNumber.from(
@@ -74,7 +75,6 @@ describe('PolygonAvatarSale.sol', function () {
       const preBuyer = BigNumber.from(
         await fixtures.sandToken.balanceOf(buyer)
       );
-      const price = toWei(5);
       const {v, r, s} = await signMint(
         fixtures.polygonAvatarSaleAsOther,
         fixtures.signer,
@@ -103,15 +103,94 @@ describe('PolygonAvatarSale.sol', function () {
         buyer
       );
     });
+    it('should fail to mint if the signature is wrong', async function () {
+      const fixtures = await setupAvatarSaleTest();
+      const buyer = fixtures.dest;
+      const tokenId = BigNumber.from(0x123);
+      const price = toWei(5);
+      const {v, r, s} = await signMint(
+        fixtures.polygonAvatarSaleAsOther,
+        fixtures.signer,
+        buyer,
+        tokenId.add(1),
+        fixtures.seller,
+        price
+      );
+      await expect(
+        fixtures.polygonAvatarSaleAsOther.execute(
+          v,
+          r,
+          s,
+          fixtures.signer,
+          buyer,
+          tokenId,
+          fixtures.seller,
+          price
+        )
+      ).to.be.revertedWith('Invalid signature');
+    });
+    it('should fail to mint if the signer is invalid', async function () {
+      const fixtures = await setupAvatarSaleTest();
+      const buyer = fixtures.dest;
+      const tokenId = BigNumber.from(0x123);
+      const price = toWei(5);
+      const {v, r, s} = await signMint(
+        fixtures.polygonAvatarSaleAsOther,
+        fixtures.other,
+        buyer,
+        tokenId,
+        fixtures.seller,
+        price
+      );
+      await expect(
+        fixtures.polygonAvatarSaleAsOther.execute(
+          v,
+          r,
+          s,
+          fixtures.other,
+          buyer,
+          tokenId,
+          fixtures.seller,
+          price
+        )
+      ).to.be.revertedWith('Invalid signer');
+    });
+    it('should fail to mint if the seller is invalid', async function () {
+      const fixtures = await setupAvatarSaleTest();
+      const buyer = fixtures.dest;
+      const tokenId = BigNumber.from(0x123);
+      const price = toWei(5);
+      const {v, r, s} = await signMint(
+        fixtures.polygonAvatarSaleAsOther,
+        fixtures.signer,
+        buyer,
+        tokenId,
+        fixtures.other,
+        price
+      );
+      await expect(
+        fixtures.polygonAvatarSaleAsOther.execute(
+          v,
+          r,
+          s,
+          fixtures.signer,
+          buyer,
+          tokenId,
+          fixtures.other,
+          price
+        )
+      ).to.be.revertedWith('Invalid seller');
+    });
 
     it('mint with metaTX trusted forwarder', async function () {
       const fixtures = await setupAvatarSaleTest();
       const buyer = fixtures.dest;
       const tokenId = BigNumber.from(0x123);
+      const price = toWei(5);
       await mintSandAndApprove(
         fixtures.sandToken,
         buyer,
-        toWei(10),
+        price,
         fixtures.polygonAvatarSaleAsOther.address
       );
       const preSeller = BigNumber.from(
@@ -120,7 +199,6 @@ describe('PolygonAvatarSale.sol', function () {
       const preBuyer = BigNumber.from(
         await fixtures.sandToken.balanceOf(buyer)
       );
-      const price = toWei(5);
       const {v, r, s} = await signMint(
         fixtures.polygonAvatarSaleAsOther,
         fixtures.signer,

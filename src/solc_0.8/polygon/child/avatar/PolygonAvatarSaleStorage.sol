@@ -9,7 +9,6 @@ import {IAvatarMinter} from "../../../common/interfaces/IAvatarMinter.sol";
 import {ERC2771Handler} from "../../../common/BaseWithStorage/ERC2771Handler.sol";
 import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
-// This contract is final, don't inherit form it.
 abstract contract PolygonAvatarSaleStorage is Upgradeable, EIP712Upgradeable, ERC2771Handler {
     bytes32 public constant SIGNER_ROLE = keccak256("SIGNER_ROLE");
     bytes32 public constant SELLER_ROLE = keccak256("SELLER_ROLE");

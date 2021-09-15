@@ -8,7 +8,6 @@ import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/acce
 import {ERC2771Handler} from "../../../common/BaseWithStorage/ERC2771Handler.sol";
 import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
-// This contract is final, don't inherit form it.
 abstract contract PolygonAvatarStorage is Upgradeable, ERC721Upgradeable, ERC2771Handler {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -16,7 +15,7 @@ abstract contract PolygonAvatarStorage is Upgradeable, ERC721Upgradeable, ERC277
 
     /**
      * @dev See {IERC165-supportsInterface}.
-     * We must implement supportsInterface because ERC721Upgradeable is not abstract.
+     * We must implement supportsInterface here because ERC721Upgradeable is not abstract.
      */
     function supportsInterface(bytes4 interfaceId)
         public

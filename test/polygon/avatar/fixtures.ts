@@ -6,7 +6,7 @@ import {
 } from 'hardhat';
 import {BigNumber, BigNumberish, Contract} from 'ethers';
 import ERC20Mock from '@openzeppelin/contracts-0.8/build/contracts/ERC20PresetMinterPauser.json';
-import {toWei} from '../../utils';
+import {Signature} from '@ethersproject/bytes';
 
 const name = 'AVATARNAME';
 const symbol = 'TSBAV';
@@ -170,10 +170,10 @@ export const mintSandAndApprove = async function (
   addr: string,
   amount: BigNumberish,
   spender: string
-) {
+): Promise<void> {
   await sandToken.mint(addr, amount);
   const sandTokenAsOther = await ethers.getContract('SandMock', addr);
-  await sandTokenAsOther.approve(spender, toWei(10));
+  await sandTokenAsOther.approve(spender, amount);
 };
 
 export const signMint = async function (
@@ -183,7 +183,7 @@ export const signMint = async function (
   tokenId: BigNumberish,
   seller: string,
   price: BigNumberish
-) {
+): Promise<Signature> {
   const chainId = BigNumber.from(await polygonAvatarSale.getChainId());
   const signature = await ethers.provider.send('eth_signTypedData_v4', [
     signer,
