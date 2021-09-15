@@ -76,7 +76,7 @@ contract PolygonAvatarSale is PolygonAvatarSaleStorage {
         address seller,
         uint256 price
     ) internal view returns (bool) {
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(MINT_TYPEHASH, buyer, id, seller, price)));
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(MINT_TYPEHASH, signer, buyer, id, seller, price)));
         address recoveredSigner = ECDSAUpgradeable.recover(digest, v, r, s);
         return recoveredSigner == signer;
     }

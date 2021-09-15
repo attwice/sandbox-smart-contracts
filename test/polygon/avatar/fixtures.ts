@@ -4,12 +4,13 @@ import {
   getNamedAccounts,
   getUnnamedAccounts,
 } from 'hardhat';
-import {Contract} from 'ethers';
+import {BigNumber, BigNumberish, Contract} from 'ethers';
+import ERC20Mock from '@openzeppelin/contracts-0.8/build/contracts/ERC20PresetMinterPauser.json';
+import {toWei} from '../../utils';
 
 const name = 'AVATARNAME';
 const symbol = 'TSBAV';
 const baseUri = 'http://api';
-
 export const setupAvatarTest = deployments.createFixture(async function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {deployer, upgradeAdmin} = await getNamedAccounts();
@@ -76,16 +77,15 @@ export const setupAvatarSaleTest = deployments.createFixture(async function () {
     trustedForwarder,
     adminRole,
     storageChanger,
-    minter,
+    seller,
+    signer,
     other,
     dest,
-    childChainManagerProxy,
-    sandAdmin,
-    executionAdmin,
   ] = await getUnnamedAccounts();
-  await deployments.deploy('PolygonSand', {
+  await deployments.deploy('SandMock', {
     from: deployer,
-    args: [childChainManagerProxy, trustedForwarder, sandAdmin, executionAdmin],
+    contract: ERC20Mock,
+    args: ['AToken', 'SAND'],
     proxy: false,
   });
 
@@ -107,8 +107,11 @@ export const setupAvatarSaleTest = deployments.createFixture(async function () {
       },
     },
   });
-  const polygonAvatar = await ethers.getContract('PolygonAvatar', deployer);
-  const sandToken = await ethers.getContract('PolygonSand', deployer);
+  const polygonAvatarAsAdmin = await ethers.getContract(
+    'PolygonAvatar',
+    adminRole
+  );
+  const sandToken = await ethers.getContract('SandMock', deployer);
 
   await deployments.deploy('PolygonAvatarSale', {
     from: deployer,
@@ -118,7 +121,7 @@ export const setupAvatarSaleTest = deployments.createFixture(async function () {
       execute: {
         methodName: 'initialize',
         args: [
-          polygonAvatar.address,
+          polygonAvatarAsAdmin.address,
           sandToken.address,
           trustedForwarder,
           adminRole,
@@ -127,24 +130,107 @@ export const setupAvatarSaleTest = deployments.createFixture(async function () {
       },
     },
   });
-  const polygonAvatarSale = await ethers.getContract(
+  const polygonAvatarSaleAsOther = await ethers.getContract(
     'PolygonAvatarSale',
-    deployer
+    other
   );
+  const polygonAvatarSaleAsAdmin = await ethers.getContract(
+    'PolygonAvatarSale',
+    adminRole
+  );
+  // Grant roles.
+  const minter = await polygonAvatarAsAdmin.MINTER_ROLE();
+  await polygonAvatarAsAdmin.grantRole(
+    minter,
+    polygonAvatarSaleAsAdmin.address
+  );
+  const signerRole = await polygonAvatarSaleAsAdmin.SIGNER_ROLE();
+  await polygonAvatarSaleAsAdmin.grantRole(signerRole, signer);
+  const sellerRole = await polygonAvatarSaleAsAdmin.SELLER_ROLE();
+  await polygonAvatarSaleAsAdmin.grantRole(sellerRole, seller);
   return {
-    polygonAvatarSale,
-    polygonAvatar,
+    polygonAvatarSaleAsOther,
+    polygonAvatarSaleAsAdmin,
+    polygonAvatarAsAdmin,
     sandToken,
     deployer,
     upgradeAdmin,
     trustedForwarder,
     adminRole,
     storageChanger,
-    minter,
+    seller,
+    signer,
     other,
     dest,
-    childChainManagerProxy,
-    sandAdmin,
-    executionAdmin,
   };
 });
+
+export const mintSandAndApprove = async function (
+  sandToken: Contract,
+  addr: string,
+  amount: BigNumberish,
+  spender: string
+) {
+  await sandToken.mint(addr, amount);
+  const sandTokenAsOther = await ethers.getContract('SandMock', addr);
+  await sandTokenAsOther.approve(spender, toWei(10));
+};
+
+export const signMint = async function (
+  polygonAvatarSale: Contract,
+  signer: string,
+  buyer: string,
+  tokenId: BigNumberish,
+  seller: string,
+  price: BigNumberish
+) {
+  const chainId = BigNumber.from(await polygonAvatarSale.getChainId());
+  const signature = await ethers.provider.send('eth_signTypedData_v4', [
+    signer,
+    {
+      types: {
+        EIP712Domain: [
+          {
+            name: 'name',
+            type: 'string',
+          },
+          {
+            name: 'version',
+            type: 'string',
+          },
+          {
+            name: 'chainId',
+            type: 'uint256',
+          },
+          {
+            name: 'verifyingContract',
+            type: 'address',
+          },
+        ],
+        // Mint(address signer,address buyer,uint id,address seller,uint price)
+        Mint: [
+          {name: 'signer', type: 'address'},
+          {name: 'buyer', type: 'address'},
+          {name: 'id', type: 'uint256'},
+          {name: 'seller', type: 'address'},
+          {name: 'price', type: 'uint256'},
+        ],
+      },
+      primaryType: 'Mint',
+      domain: {
+        name: 'Sandbox Avatar Sale',
+        version: '1.0',
+        chainId: chainId.toString(),
+        verifyingContract: polygonAvatarSale.address,
+      },
+      message: {
+        signer: signer,
+        buyer: buyer,
+        id: tokenId.toString(),
+        seller: seller,
+        price: price.toString(),
+      },
+    },
+  ]);
+  return ethers.utils.splitSignature(signature);
+};

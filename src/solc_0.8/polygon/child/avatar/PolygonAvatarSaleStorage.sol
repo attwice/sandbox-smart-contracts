@@ -15,8 +15,8 @@ abstract contract PolygonAvatarSaleStorage is Upgradeable, EIP712Upgradeable, ER
     bytes32 public constant SELLER_ROLE = keccak256("SELLER_ROLE");
     bytes32 public constant MINT_TYPEHASH =
         keccak256("Mint(address signer,address buyer,uint256 id,address seller,uint256 price)");
-    string public name = "Sandbox Avatar Sale";
-    string public version = "1.0";
+    string public constant name = "Sandbox Avatar Sale";
+    string public constant version = "1.0";
     IAvatarMinter public polygonAvatarAddress;
     IERC20Upgradeable public sandTokenContractAddress;
 
