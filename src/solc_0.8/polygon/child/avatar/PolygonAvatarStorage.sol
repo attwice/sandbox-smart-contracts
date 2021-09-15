@@ -8,6 +8,7 @@ import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/acce
 import {ERC2771Handler} from "../../../common/BaseWithStorage/ERC2771Handler.sol";
 import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
+/// @dev Storage layout for the PolygonAvatar contract.
 abstract contract PolygonAvatarStorage is Upgradeable, ERC721Upgradeable, ERC2771Handler {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 

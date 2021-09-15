@@ -8,7 +8,11 @@ import {PolygonAvatarSaleStorage} from "./PolygonAvatarSaleStorage.sol";
 import {IAvatarMinter} from "../../../common/interfaces/IAvatarMinter.sol";
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-// This contract is final, don't inherit form it.
+/// @title This contract is in charge calling PolygonAvatar.mint.
+/// @title minting is done by sending messages signed by a user in the signer role, the contract takes the buyer
+/// @title sand and send it to a whitelisted seller.
+/// @dev This contract support meta transactions.
+/// @dev This contract is final, don't inherit form it.
 contract PolygonAvatarSale is PolygonAvatarSaleStorage {
     function initialize(
         IAvatarMinter polygonAvatarAddress_,
@@ -27,6 +31,16 @@ contract PolygonAvatarSale is PolygonAvatarSaleStorage {
         sandTokenContractAddress = sandTokenContractAddress_;
     }
 
+    /// @notice verifies a ERC712 signature for the Mint data type.
+    /// @param v signature part
+    /// @param r signature part
+    /// @param s signature part
+    /// @param signer the address of the signer, must be part of the signer role
+    /// @param buyer the buyer of the NFT, sand is taken from him.
+    /// @param id NFT Id
+    /// @param seller the seller of the NFT, must be whitelisted in the seller role, sand are sent to him
+    /// @param price price in Sand of the NFT
+    /// @return true if the signature is valid
     function verify(
         uint8 v,
         bytes32 r,
@@ -40,6 +54,15 @@ contract PolygonAvatarSale is PolygonAvatarSaleStorage {
         return _verify(v, r, s, signer, buyer, id, seller, price);
     }
 
+    /// @notice verifies a ERC712 signature and mint a new NFT for the buyer.
+    /// @param v signature part
+    /// @param r signature part
+    /// @param s signature part
+    /// @param signer the address of the signer, must be part of the signer role
+    /// @param buyer the buyer of the NFT, sand is taken from him.
+    /// @param id NFT Id
+    /// @param seller the seller of the NFT, must be whitelisted in the seller role, sand are sent to him
+    /// @param price price in Sand of the NFT
     function execute(
         uint8 v,
         bytes32 r,

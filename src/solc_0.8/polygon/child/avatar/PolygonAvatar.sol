@@ -5,7 +5,9 @@ pragma solidity 0.8.2;
 import {PolygonAvatarStorage} from "./PolygonAvatarStorage.sol";
 import {IAvatarMinter} from "../../../common/interfaces/IAvatarMinter.sol";
 
-// This contract is final, don't inherit form it.
+/// @title This contract is a erc 721 compatible NFT token that represents an avatar and can be minted by a minter role.
+/// @dev This contract support meta transactions.
+/// @dev This contract is final, don't inherit form it.
 contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
     function initialize(
         string memory name_,
