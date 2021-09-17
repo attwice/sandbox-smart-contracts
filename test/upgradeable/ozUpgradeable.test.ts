@@ -1,8 +1,9 @@
 import {deployments, ethers, getUnnamedAccounts} from 'hardhat';
 import {BigNumber} from 'ethers';
 import {expect} from 'chai';
+import {withSnapshot} from '../utils';
 
-const setupTest = deployments.createFixture(async function () {
+const setupTest = withSnapshot([], async function () {
   const [
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _,
@@ -43,20 +44,6 @@ const setupTest = deployments.createFixture(async function () {
 // The initial owner of a proxyAdmin is the one related to the first deploy so some care must be taken when writing
 // deploy scripts.
 describe('OpenZeppelinTransparentProxy explanation', function () {
-  before(async function () {
-    // The problem is that hardhat-deploy find a proxyAdmin form other tests
-    // (the testing environment is dirty)
-    // getOrNull(name: string) => {
-    //   ...
-    //   return this.db.deployments[name];
-    // }
-    // We need to erase this.db.deployments so the proxyAdmin is re-deployed
-    // This does the trick
-    await deployments.fixture([], {
-      fallbackToGlobal: false,
-      keepExistingDeployments: false,
-    });
-  });
   it('there is no way to call directly the admin operations on the proxy', async function () {
     const fixtures = await setupTest();
     expect(await fixtures.upgradeableMock.callStatic['admin']()).to.be.equal(

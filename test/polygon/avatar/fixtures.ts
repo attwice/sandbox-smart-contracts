@@ -7,11 +7,12 @@ import {
 import {BigNumber, BigNumberish, Contract} from 'ethers';
 import ERC20Mock from '@openzeppelin/contracts-0.8/build/contracts/ERC20PresetMinterPauser.json';
 import {Signature} from '@ethersproject/bytes';
+import {withSnapshot} from '../../utils';
 
 const name = 'AVATARNAME';
 const symbol = 'TSBAV';
 const baseUri = 'http://api';
-export const setupAvatarTest = deployments.createFixture(async function () {
+export const setupAvatarTest = withSnapshot([], async function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {deployer, upgradeAdmin} = await getNamedAccounts();
   const [
@@ -70,7 +71,7 @@ export const addMinter = async function (
   await polygonAvatarAsAdmin.grantRole(minterRole, addr);
 };
 
-export const setupAvatarSaleTest = deployments.createFixture(async function () {
+export const setupAvatarSaleTest = withSnapshot([], async function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {deployer, upgradeAdmin} = await getNamedAccounts();
   const [

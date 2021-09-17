@@ -2,8 +2,9 @@ import {deployments, ethers, getUnnamedAccounts} from 'hardhat';
 import {BigNumber} from 'ethers';
 import {expect} from 'chai';
 import {defaultAbiCoder} from 'ethers/lib/utils';
+import {withSnapshot} from '../utils';
 
-const setupTest = deployments.createFixture(async function () {
+const setupTest = withSnapshot([], async function () {
   const [
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _,
@@ -35,19 +36,6 @@ const setupTest = deployments.createFixture(async function () {
   };
 });
 describe('Upgradeable storage change mechanism', function () {
-  before(async function () {
-    // The problem is that
-    // getOrNull(name: string) => {
-    //   ...
-    //   return this.db.deployments[name];
-    // }
-    // We need to erase this.db.deployments so the proxyAdmin is re-deployed
-    // This does the trick
-    await deployments.fixture([], {
-      fallbackToGlobal: false,
-      keepExistingDeployments: false,
-    });
-  });
   it('initialization', async function () {
     const fixtures = await setupTest();
     expect(await fixtures.upgradeableMock.someValue1()).to.be.equal(
