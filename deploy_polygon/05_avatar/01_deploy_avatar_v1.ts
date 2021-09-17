@@ -11,7 +11,7 @@ const func: DeployFunction = async function (
 
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
 
-  await deploy('PolygonAvatar', {
+  await deploy('Avatar', {
     from: deployer,
     proxy: {
       owner: upgradeAdmin,
@@ -35,6 +35,6 @@ const func: DeployFunction = async function (
 };
 
 export default func;
-func.tags = ['PolygonAvatar', 'PolygonAvatar_deploy'];
+func.tags = ['Avatar', 'Avatar_deploy'];
 func.dependencies = ['TRUSTED_FORWARDER'];
 func.skip = skipUnlessTestnet;
