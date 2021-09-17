@@ -2,15 +2,14 @@
 // solhint-disable-next-line compiler-version
 pragma solidity 0.8.2;
 
-import {PolygonAvatarStorage} from "./PolygonAvatarStorage.sol";
-import {IAvatarMinter} from "../../../common/interfaces/IAvatarMinter.sol";
+import {AvatarStorage} from "./AvatarStorage.sol";
+import {IAvatarMinter} from "../common/interfaces/IAvatarMinter.sol";
 
 /// @title This contract is a erc 721 compatible NFT token that represents an avatar and can be minted by a minter role.
 /// @dev This contract support meta transactions.
 /// @dev This contract is final, don't inherit form it.
-contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
+contract Avatar is AvatarStorage, IAvatarMinter {
     function initialize(
-        address L1TokenAddress_,
         string memory name_,
         string memory symbol_,
         string memory baseTokenURI_,
@@ -24,7 +23,6 @@ contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
         __UpgradeableBase_init_unchained(defaultAdmin_, storageChanger_);
         __ERC721_init_unchained(name_, symbol_);
         __ERC2771Handler_initialize(trustedForwarder_);
-        L1TokenAddress = L1TokenAddress_;
         baseTokenURI = baseTokenURI_;
     }
 
@@ -43,28 +41,6 @@ contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
         require(hasRole(MINTER_ROLE, _msgSender()), "must have minter role");
         // TODO: we want call the callback for this one _safeMint ?
         _mint(to, id);
-    }
-
-    /**
-     * @notice Deposit tokens
-     * @param user address for deposit
-     * @param tokenId tokenId to mint to user's account
-     */
-    function deposit(address user, uint256 tokenId) public {
-        require(hasRole(CHILD_MANAGER_ROLE, _msgSender()), "!CHILD_MANAGER_ROLE");
-        require(user != address(0x0));
-        _mint(user, tokenId);
-        emit Deposit(L1TokenAddress, user, tokenId);
-    }
-
-    /**
-     * @notice Withdraw tokens
-     * @param tokenId tokenId of the token to be withdrawn
-     */
-    function withdraw(uint256 tokenId) public payable {
-        require(ownerOf(tokenId) == _msgSender(), "Not owner");
-        _burn(tokenId);
-        emit Withdraw(L1TokenAddress, _msgSender(), tokenId);
     }
 
     function _baseURI() internal view override returns (string memory) {

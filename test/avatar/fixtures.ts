@@ -23,7 +23,7 @@ export const setupAvatarTest = withSnapshot([], async function () {
     other,
     dest,
   ] = await getUnnamedAccounts();
-  await deployments.deploy('PolygonAvatar', {
+  await deployments.deploy('Avatar', {
     from: deployer,
     proxy: {
       owner: upgradeAdmin,
@@ -41,12 +41,12 @@ export const setupAvatarTest = withSnapshot([], async function () {
       },
     },
   });
-  const polygonAvatar = await ethers.getContract('PolygonAvatar', deployer);
+  const avatar = await ethers.getContract('Avatar', deployer);
   return {
     baseUri,
     symbol,
     name,
-    polygonAvatar,
+    avatar,
     deployer,
     upgradeAdmin,
     trustedForwarder,
@@ -60,15 +60,12 @@ export const setupAvatarTest = withSnapshot([], async function () {
 
 export const addMinter = async function (
   adminRole: string,
-  polygonAvatar: Contract,
+  avatar: Contract,
   addr: string
 ): Promise<void> {
-  const polygonAvatarAsAdmin = await ethers.getContract(
-    'PolygonAvatar',
-    adminRole
-  );
-  const minterRole = await polygonAvatar.MINTER_ROLE();
-  await polygonAvatarAsAdmin.grantRole(minterRole, addr);
+  const avatarAsAdmin = await ethers.getContract('Avatar', adminRole);
+  const minterRole = await avatar.MINTER_ROLE();
+  await avatarAsAdmin.grantRole(minterRole, addr);
 };
 
 export const setupAvatarSaleTest = withSnapshot([], async function () {
@@ -90,7 +87,7 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
     proxy: false,
   });
 
-  await deployments.deploy('PolygonAvatar', {
+  await deployments.deploy('Avatar', {
     from: deployer,
     proxy: {
       owner: upgradeAdmin,
@@ -108,13 +105,10 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
       },
     },
   });
-  const polygonAvatarAsAdmin = await ethers.getContract(
-    'PolygonAvatar',
-    adminRole
-  );
+  const avatarAsAdmin = await ethers.getContract('Avatar', adminRole);
   const sandToken = await ethers.getContract('SandMock', deployer);
 
-  await deployments.deploy('PolygonAvatarSale', {
+  await deployments.deploy('AvatarSale', {
     from: deployer,
     proxy: {
       owner: upgradeAdmin,
@@ -122,7 +116,7 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
       execute: {
         methodName: 'initialize',
         args: [
-          polygonAvatarAsAdmin.address,
+          avatarAsAdmin.address,
           sandToken.address,
           trustedForwarder,
           adminRole,
@@ -131,28 +125,19 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
       },
     },
   });
-  const polygonAvatarSaleAsOther = await ethers.getContract(
-    'PolygonAvatarSale',
-    other
-  );
-  const polygonAvatarSaleAsAdmin = await ethers.getContract(
-    'PolygonAvatarSale',
-    adminRole
-  );
+  const avatarSaleAsOther = await ethers.getContract('AvatarSale', other);
+  const avatarSaleAsAdmin = await ethers.getContract('AvatarSale', adminRole);
   // Grant roles.
-  const minter = await polygonAvatarAsAdmin.MINTER_ROLE();
-  await polygonAvatarAsAdmin.grantRole(
-    minter,
-    polygonAvatarSaleAsAdmin.address
-  );
-  const signerRole = await polygonAvatarSaleAsAdmin.SIGNER_ROLE();
-  await polygonAvatarSaleAsAdmin.grantRole(signerRole, signer);
-  const sellerRole = await polygonAvatarSaleAsAdmin.SELLER_ROLE();
-  await polygonAvatarSaleAsAdmin.grantRole(sellerRole, seller);
+  const minter = await avatarAsAdmin.MINTER_ROLE();
+  await avatarAsAdmin.grantRole(minter, avatarSaleAsAdmin.address);
+  const signerRole = await avatarSaleAsAdmin.SIGNER_ROLE();
+  await avatarSaleAsAdmin.grantRole(signerRole, signer);
+  const sellerRole = await avatarSaleAsAdmin.SELLER_ROLE();
+  await avatarSaleAsAdmin.grantRole(sellerRole, seller);
   return {
-    polygonAvatarSaleAsOther,
-    polygonAvatarSaleAsAdmin,
-    polygonAvatarAsAdmin,
+    avatarSaleAsOther,
+    avatarSaleAsAdmin,
+    avatarAsAdmin,
     sandToken,
     deployer,
     upgradeAdmin,
@@ -178,14 +163,14 @@ export const mintSandAndApprove = async function (
 };
 
 export const signMint = async function (
-  polygonAvatarSale: Contract,
+  avatarSale: Contract,
   signer: string,
   buyer: string,
   tokenId: BigNumberish,
   seller: string,
   price: BigNumberish
 ): Promise<Signature> {
-  const chainId = BigNumber.from(await polygonAvatarSale.getChainId());
+  const chainId = BigNumber.from(await avatarSale.getChainId());
   const signature = await ethers.provider.send('eth_signTypedData_v4', [
     signer,
     {
@@ -222,7 +207,7 @@ export const signMint = async function (
         name: 'Sandbox Avatar Sale',
         version: '1.0',
         chainId: chainId.toString(),
-        verifyingContract: polygonAvatarSale.address,
+        verifyingContract: avatarSale.address,
       },
       message: {
         signer: signer,

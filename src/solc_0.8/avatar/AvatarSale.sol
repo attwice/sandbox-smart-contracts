@@ -4,18 +4,18 @@ pragma solidity 0.8.2;
 
 import {ECDSAUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {PolygonAvatarSaleStorage} from "./PolygonAvatarSaleStorage.sol";
-import {IAvatarMinter} from "../../../common/interfaces/IAvatarMinter.sol";
+import {AvatarSaleStorage} from "./AvatarSaleStorage.sol";
+import {IAvatarMinter} from "../common/interfaces/IAvatarMinter.sol";
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-/// @title This contract is in charge calling PolygonAvatar.mint.
+/// @title This contract is in charge calling Avatar.mint.
 /// @title minting is done by sending messages signed by a user in the signer role, the contract takes the buyer
 /// @title sand and send it to a whitelisted seller.
 /// @dev This contract support meta transactions.
 /// @dev This contract is final, don't inherit form it.
-contract PolygonAvatarSale is PolygonAvatarSaleStorage {
+contract AvatarSale is AvatarSaleStorage {
     function initialize(
-        IAvatarMinter polygonAvatarAddress_,
+        IAvatarMinter avatarTokenAddress_,
         IERC20Upgradeable sandTokenContractAddress_,
         address trustedForwarder_,
         address defaultAdmin_,
@@ -27,8 +27,8 @@ contract PolygonAvatarSale is PolygonAvatarSaleStorage {
         __UpgradeableBase_init_unchained(defaultAdmin_, storageChanger_);
         __EIP712_init_unchained(name, version);
         __ERC2771Handler_initialize(trustedForwarder_);
-        polygonAvatarAddress = polygonAvatarAddress_;
-        sandTokenContractAddress = sandTokenContractAddress_;
+        avatarTokenAddress = avatarTokenAddress_;
+        sandTokenAddress = sandTokenContractAddress_;
     }
 
     /// @notice verifies a ERC712 signature for the Mint data type.
@@ -76,9 +76,9 @@ contract PolygonAvatarSale is PolygonAvatarSaleStorage {
         require(_verify(v, r, s, signer, buyer, id, seller, price), "Invalid signature");
         require(hasRole(SIGNER_ROLE, signer), "Invalid signer");
         require(hasRole(SELLER_ROLE, seller), "Invalid seller");
-        polygonAvatarAddress.mint(buyer, id);
-        require(sandTokenContractAddress.transferFrom(buyer, address(this), price), "TransferFrom failed");
-        require(sandTokenContractAddress.transfer(seller, price), "Transfer failed");
+        avatarTokenAddress.mint(buyer, id);
+        require(sandTokenAddress.transferFrom(buyer, address(this), price), "TransferFrom failed");
+        require(sandTokenAddress.transfer(seller, price), "Transfer failed");
     }
 
     function domainSeparator() external view returns (bytes32) {

@@ -5,7 +5,7 @@ import {mintSandAndApprove, setupAvatarSaleTest, signMint} from './fixtures';
 import {BigNumber} from 'ethers';
 import {toWei} from '../../utils';
 
-describe('PolygonAvatarSale.sol', function () {
+describe('AvatarSale.sol', function () {
   describe('initialization', function () {
     it('interfaces', async function () {
       const fixtures = await setupAvatarSaleTest();
@@ -14,24 +14,24 @@ describe('PolygonAvatarSale.sol', function () {
         IAccessControl: '0x7965db0b',
       };
       for (const i of Object.values(interfaces)) {
-        expect(await fixtures.polygonAvatarSaleAsOther.supportsInterface(i)).to
-          .be.true;
+        expect(await fixtures.avatarSaleAsOther.supportsInterface(i)).to.be
+          .true;
       }
     });
   });
   describe('roles', function () {
     it('admin', async function () {
       const fixtures = await setupAvatarSaleTest();
-      const defaultAdminRole = await fixtures.polygonAvatarSaleAsOther.DEFAULT_ADMIN_ROLE();
+      const defaultAdminRole = await fixtures.avatarSaleAsOther.DEFAULT_ADMIN_ROLE();
       expect(
-        await fixtures.polygonAvatarSaleAsOther.hasRole(
+        await fixtures.avatarSaleAsOther.hasRole(
           defaultAdminRole,
           fixtures.adminRole
         )
       ).to.be.true;
-      const storageChangerRole = await fixtures.polygonAvatarSaleAsOther.STORAGE_CHANGER_ROLE();
+      const storageChangerRole = await fixtures.avatarSaleAsOther.STORAGE_CHANGER_ROLE();
       expect(
-        await fixtures.polygonAvatarSaleAsOther.hasRole(
+        await fixtures.avatarSaleAsOther.hasRole(
           storageChangerRole,
           fixtures.storageChanger
         )
@@ -40,19 +40,13 @@ describe('PolygonAvatarSale.sol', function () {
 
     it('signer and seller', async function () {
       const fixtures = await setupAvatarSaleTest();
-      const signerRole = await fixtures.polygonAvatarSaleAsOther.SIGNER_ROLE();
+      const signerRole = await fixtures.avatarSaleAsOther.SIGNER_ROLE();
       expect(
-        await fixtures.polygonAvatarSaleAsOther.hasRole(
-          signerRole,
-          fixtures.signer
-        )
+        await fixtures.avatarSaleAsOther.hasRole(signerRole, fixtures.signer)
       ).to.be.true;
-      const sellerRole = await fixtures.polygonAvatarSaleAsOther.SELLER_ROLE();
+      const sellerRole = await fixtures.avatarSaleAsOther.SELLER_ROLE();
       expect(
-        await fixtures.polygonAvatarSaleAsOther.hasRole(
-          sellerRole,
-          fixtures.seller
-        )
+        await fixtures.avatarSaleAsOther.hasRole(sellerRole, fixtures.seller)
       ).to.be.true;
     });
   });
@@ -67,7 +61,7 @@ describe('PolygonAvatarSale.sol', function () {
         fixtures.sandToken,
         buyer,
         price,
-        fixtures.polygonAvatarSaleAsOther.address
+        fixtures.avatarSaleAsOther.address
       );
       const preSeller = BigNumber.from(
         await fixtures.sandToken.balanceOf(fixtures.seller)
@@ -76,14 +70,14 @@ describe('PolygonAvatarSale.sol', function () {
         await fixtures.sandToken.balanceOf(buyer)
       );
       const {v, r, s} = await signMint(
-        fixtures.polygonAvatarSaleAsOther,
+        fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,
         tokenId,
         fixtures.seller,
         price
       );
-      await fixtures.polygonAvatarSaleAsOther.execute(
+      await fixtures.avatarSaleAsOther.execute(
         v,
         r,
         s,
@@ -99,9 +93,7 @@ describe('PolygonAvatarSale.sol', function () {
       expect(await fixtures.sandToken.balanceOf(buyer)).to.be.equal(
         preBuyer.sub(price)
       );
-      expect(await fixtures.polygonAvatarAsAdmin.ownerOf(tokenId)).to.be.equal(
-        buyer
-      );
+      expect(await fixtures.avatarAsAdmin.ownerOf(tokenId)).to.be.equal(buyer);
     });
     it('should fail to mint if the signature is wrong', async function () {
       const fixtures = await setupAvatarSaleTest();
@@ -109,7 +101,7 @@ describe('PolygonAvatarSale.sol', function () {
       const tokenId = BigNumber.from(0x123);
       const price = toWei(5);
       const {v, r, s} = await signMint(
-        fixtures.polygonAvatarSaleAsOther,
+        fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,
         tokenId.add(1),
@@ -117,7 +109,7 @@ describe('PolygonAvatarSale.sol', function () {
         price
       );
       await expect(
-        fixtures.polygonAvatarSaleAsOther.execute(
+        fixtures.avatarSaleAsOther.execute(
           v,
           r,
           s,
@@ -135,7 +127,7 @@ describe('PolygonAvatarSale.sol', function () {
       const tokenId = BigNumber.from(0x123);
       const price = toWei(5);
       const {v, r, s} = await signMint(
-        fixtures.polygonAvatarSaleAsOther,
+        fixtures.avatarSaleAsOther,
         fixtures.other,
         buyer,
         tokenId,
@@ -143,7 +135,7 @@ describe('PolygonAvatarSale.sol', function () {
         price
       );
       await expect(
-        fixtures.polygonAvatarSaleAsOther.execute(
+        fixtures.avatarSaleAsOther.execute(
           v,
           r,
           s,
@@ -161,7 +153,7 @@ describe('PolygonAvatarSale.sol', function () {
       const tokenId = BigNumber.from(0x123);
       const price = toWei(5);
       const {v, r, s} = await signMint(
-        fixtures.polygonAvatarSaleAsOther,
+        fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,
         tokenId,
@@ -169,7 +161,7 @@ describe('PolygonAvatarSale.sol', function () {
         price
       );
       await expect(
-        fixtures.polygonAvatarSaleAsOther.execute(
+        fixtures.avatarSaleAsOther.execute(
           v,
           r,
           s,
@@ -191,7 +183,7 @@ describe('PolygonAvatarSale.sol', function () {
         fixtures.sandToken,
         buyer,
         price,
-        fixtures.polygonAvatarSaleAsOther.address
+        fixtures.avatarSaleAsOther.address
       );
       const preSeller = BigNumber.from(
         await fixtures.sandToken.balanceOf(fixtures.seller)
@@ -200,7 +192,7 @@ describe('PolygonAvatarSale.sol', function () {
         await fixtures.sandToken.balanceOf(buyer)
       );
       const {v, r, s} = await signMint(
-        fixtures.polygonAvatarSaleAsOther,
+        fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,
         tokenId,
@@ -208,12 +200,12 @@ describe('PolygonAvatarSale.sol', function () {
         price
       );
 
-      const polygonAvatarSaleAsTrustedForwarder = await ethers.getContract(
-        'PolygonAvatarSale',
+      const avatarSaleAsTrustedForwarder = await ethers.getContract(
+        'AvatarSale',
         fixtures.trustedForwarder
       );
 
-      const txData = await polygonAvatarSaleAsTrustedForwarder.populateTransaction.execute(
+      const txData = await avatarSaleAsTrustedForwarder.populateTransaction.execute(
         v,
         r,
         s,
@@ -228,7 +220,7 @@ describe('PolygonAvatarSale.sol', function () {
         ['bytes', 'address'],
         [txData.data, fixtures.other]
       );
-      await polygonAvatarSaleAsTrustedForwarder.signer.sendTransaction(txData);
+      await avatarSaleAsTrustedForwarder.signer.sendTransaction(txData);
 
       expect(await fixtures.sandToken.balanceOf(fixtures.seller)).to.be.equal(
         preSeller.add(price)
@@ -236,9 +228,7 @@ describe('PolygonAvatarSale.sol', function () {
       expect(await fixtures.sandToken.balanceOf(buyer)).to.be.equal(
         preBuyer.sub(price)
       );
-      expect(await fixtures.polygonAvatarAsAdmin.ownerOf(tokenId)).to.be.equal(
-        buyer
-      );
+      expect(await fixtures.avatarAsAdmin.ownerOf(tokenId)).to.be.equal(buyer);
     });
   });
 });
