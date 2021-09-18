@@ -5,6 +5,7 @@ pragma solidity 0.8.2;
 import {AvatarStorageBase} from "./AvatarStorageBase.sol";
 
 /// @dev Storage layout for the Avatar contract.
+// solhint-disable no-empty-blocks
 abstract contract AvatarStorage is AvatarStorageBase {
 
 }

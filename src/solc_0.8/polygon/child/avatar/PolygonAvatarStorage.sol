@@ -9,5 +9,5 @@ abstract contract PolygonAvatarStorage is AvatarStorageBase {
     event Deposit(address indexed token, address indexed from, uint256 tokenId);
     event Withdraw(address indexed token, address indexed from, uint256 tokenId);
     bytes32 public constant CHILD_MANAGER_ROLE = keccak256("CHILD_MANAGER_ROLE");
-    address L1TokenAddress;
+    address public l1TokenAddress;
 }

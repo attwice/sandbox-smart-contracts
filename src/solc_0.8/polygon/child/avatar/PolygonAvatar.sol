@@ -10,7 +10,7 @@ import {IAvatarMinter} from "../../../common/interfaces/IAvatarMinter.sol";
 /// @dev This contract is final, don't inherit form it.
 contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
     function initialize(
-        address L1TokenAddress_,
+        address l1TokenAddress_,
         string memory name_,
         string memory symbol_,
         string memory baseTokenURI_,
@@ -24,7 +24,7 @@ contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
         __UpgradeableBase_init_unchained(defaultAdmin_, storageChanger_);
         __ERC721_init_unchained(name_, symbol_);
         __ERC2771Handler_initialize(trustedForwarder_);
-        L1TokenAddress = L1TokenAddress_;
+        l1TokenAddress = l1TokenAddress_;
         baseTokenURI = baseTokenURI_;
     }
 
@@ -52,9 +52,9 @@ contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
      */
     function deposit(address user, uint256 tokenId) public {
         require(hasRole(CHILD_MANAGER_ROLE, _msgSender()), "!CHILD_MANAGER_ROLE");
-        require(user != address(0x0));
+        require(user != address(0x0), "invalid user");
         _mint(user, tokenId);
-        emit Deposit(L1TokenAddress, user, tokenId);
+        emit Deposit(l1TokenAddress, user, tokenId);
     }
 
     /**
@@ -64,7 +64,7 @@ contract PolygonAvatar is PolygonAvatarStorage, IAvatarMinter {
     function withdraw(uint256 tokenId) public payable {
         require(ownerOf(tokenId) == _msgSender(), "Not owner");
         _burn(tokenId);
-        emit Withdraw(L1TokenAddress, _msgSender(), tokenId);
+        emit Withdraw(l1TokenAddress, _msgSender(), tokenId);
     }
 
     function _baseURI() internal view override returns (string memory) {
