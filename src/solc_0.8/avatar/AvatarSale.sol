@@ -2,10 +2,14 @@
 // solhint-disable-next-line compiler-version
 pragma solidity 0.8.2;
 
-import {ECDSAUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {Upgradeable} from "../common/BaseWithStorage/Upgradeable.sol";
+import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
 import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {AvatarSaleStorage} from "./AvatarSaleStorage.sol";
 import {IAvatarMinter} from "../common/interfaces/IAvatarMinter.sol";
+import {ERC2771Handler} from "../common/BaseWithStorage/ERC2771Handler.sol";
+import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+import {ECDSAUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 /// @title This contract is in charge calling Avatar.mint.
@@ -13,20 +17,36 @@ import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/acce
 /// @title sand and send it to a whitelisted seller.
 /// @dev This contract support meta transactions.
 /// @dev This contract is final, don't inherit form it.
-contract AvatarSale is AvatarSaleStorage {
+contract AvatarSale is
+    Initializable,
+    ContextUpgradeable,
+    AccessControlUpgradeable,
+    EIP712Upgradeable,
+    ERC2771Handler,
+    Upgradeable
+{
+    bytes32 public constant SIGNER_ROLE = keccak256("SIGNER_ROLE");
+    bytes32 public constant SELLER_ROLE = keccak256("SELLER_ROLE");
+    bytes32 public constant MINT_TYPEHASH =
+        keccak256("Mint(address signer,address buyer,uint256 id,address seller,uint256 price)");
+    string public constant name = "Sandbox Avatar Sale";
+    string public constant version = "1.0";
+    IAvatarMinter public avatarTokenAddress;
+    IERC20Upgradeable public sandTokenAddress;
+
     function initialize(
         IAvatarMinter avatarTokenAddress_,
         IERC20Upgradeable sandTokenContractAddress_,
         address trustedForwarder_,
-        address defaultAdmin_,
-        address storageChanger_
+        address defaultAdmin_
     ) external initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
-        __UpgradeableBase_init_unchained(defaultAdmin_, storageChanger_);
         __EIP712_init_unchained(name, version);
         __ERC2771Handler_initialize(trustedForwarder_);
+
+        _setupRole(DEFAULT_ADMIN_ROLE, defaultAdmin_);
         avatarTokenAddress = avatarTokenAddress_;
         sandTokenAddress = sandTokenContractAddress_;
     }
@@ -87,6 +107,14 @@ contract AvatarSale is AvatarSaleStorage {
 
     function getChainId() external view returns (uint256) {
         return block.chainid;
+    }
+
+    function _msgSender() internal view override(ContextUpgradeable, ERC2771Handler) returns (address sender) {
+        return ERC2771Handler._msgSender();
+    }
+
+    function _msgData() internal view override(ContextUpgradeable, ERC2771Handler) returns (bytes calldata) {
+        return ERC2771Handler._msgData();
     }
 
     function _verify(

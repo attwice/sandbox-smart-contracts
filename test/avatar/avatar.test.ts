@@ -36,13 +36,6 @@ describe('Avatar.sol', function () {
       expect(
         await fixtures.avatar.hasRole(defaultAdminRole, fixtures.adminRole)
       ).to.be.true;
-      const storageChangerRole = await fixtures.avatar.STORAGE_CHANGER_ROLE();
-      expect(
-        await fixtures.avatar.hasRole(
-          storageChangerRole,
-          fixtures.storageChanger
-        )
-      ).to.be.true;
     });
 
     it('minter', async function () {

@@ -29,13 +29,6 @@ describe('AvatarSale.sol', function () {
           fixtures.adminRole
         )
       ).to.be.true;
-      const storageChangerRole = await fixtures.avatarSaleAsOther.STORAGE_CHANGER_ROLE();
-      expect(
-        await fixtures.avatarSaleAsOther.hasRole(
-          storageChangerRole,
-          fixtures.storageChanger
-        )
-      ).to.be.true;
     });
 
     it('signer and seller', async function () {

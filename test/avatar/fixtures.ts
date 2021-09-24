@@ -18,7 +18,6 @@ export const setupAvatarTest = withSnapshot([], async function () {
   const [
     trustedForwarder,
     adminRole,
-    storageChanger,
     minter,
     other,
     dest,
@@ -30,14 +29,7 @@ export const setupAvatarTest = withSnapshot([], async function () {
       proxyContract: 'OptimizedTransparentProxy',
       execute: {
         methodName: 'initialize',
-        args: [
-          name,
-          symbol,
-          baseUri,
-          trustedForwarder,
-          adminRole,
-          storageChanger,
-        ],
+        args: [name, symbol, baseUri, trustedForwarder, adminRole],
       },
     },
   });
@@ -51,7 +43,6 @@ export const setupAvatarTest = withSnapshot([], async function () {
     upgradeAdmin,
     trustedForwarder,
     adminRole,
-    storageChanger,
     minter,
     other,
     dest,
@@ -74,7 +65,6 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
   const [
     trustedForwarder,
     adminRole,
-    storageChanger,
     seller,
     signer,
     other,
@@ -94,14 +84,7 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
       proxyContract: 'OptimizedTransparentProxy',
       execute: {
         methodName: 'initialize',
-        args: [
-          name,
-          symbol,
-          baseUri,
-          trustedForwarder,
-          adminRole,
-          storageChanger,
-        ],
+        args: [name, symbol, baseUri, trustedForwarder, adminRole],
       },
     },
   });
@@ -120,7 +103,6 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
           sandToken.address,
           trustedForwarder,
           adminRole,
-          storageChanger,
         ],
       },
     },
@@ -143,7 +125,6 @@ export const setupAvatarSaleTest = withSnapshot([], async function () {
     upgradeAdmin,
     trustedForwarder,
     adminRole,
-    storageChanger,
     seller,
     signer,
     other,
