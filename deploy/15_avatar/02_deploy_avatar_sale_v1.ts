@@ -1,3 +1,5 @@
+// TODO: Validate if we want a L1 avatar sale contract ?
+
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {skipUnlessTestnet} from '../../utils/network';
@@ -15,11 +17,11 @@ const func: DeployFunction = async function (
   } = await getNamedAccounts();
   const {deploy} = deployments;
 
-  const avatarContract = await deployments.get('PolygonAvatar');
+  const avatarContract = await deployments.get('Avatar');
   const sandContract = await deployments.get('Sand');
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
   const adminRole = sandAdmin;
-  await deploy('PolygonAvatarSale', {
+  await deploy('AvatarSale', {
     from: deployer,
     contract: 'AvatarSale',
     proxy: {
@@ -39,27 +41,27 @@ const func: DeployFunction = async function (
   });
 
   // Grant roles.
-  const minterRole = await deployments.read('PolygonAvatar', 'MINTER_ROLE');
+  const minterRole = await deployments.read('Avatar', 'MINTER_ROLE');
   await deployments.execute(
-    'PolygonAvatar',
+    'Avatar',
     {from: adminRole, log: true},
     'grantRole',
     minterRole,
     avatarContract.address
   );
 
-  const signerRole = await deployments.read('PolygonAvatarSale', 'SIGNER_ROLE');
+  const signerRole = await deployments.read('AvatarSale', 'SIGNER_ROLE');
   await deployments.execute(
-    'PolygonAvatarSale',
+    'AvatarSale',
     {from: adminRole, log: true},
     'grantRole',
     signerRole,
     backendAuthWallet
   );
 
-  const sellerRole = await deployments.read('PolygonAvatarSale', 'SELLER_ROLE');
+  const sellerRole = await deployments.read('AvatarSale', 'SELLER_ROLE');
   await deployments.execute(
-    'PolygonAvatarSale',
+    'AvatarSale',
     {from: adminRole, log: true},
     'grantRole',
     sellerRole,
@@ -68,6 +70,6 @@ const func: DeployFunction = async function (
 };
 
 export default func;
-func.tags = ['PolygonAvatarSale', 'PolygonAvatarSale_deploy'];
-func.dependencies = ['TRUSTED_FORWARDER', 'PolygonAvatar', 'Sand'];
+func.tags = ['AvatarSale', 'AvatarSale_deploy'];
+func.dependencies = ['TRUSTED_FORWARDER', 'Avatar', 'Sand'];
 func.skip = skipUnlessTestnet;

@@ -30,14 +30,36 @@ describe('Avatar.sol', function () {
     });
   });
   describe('roles', function () {
-    it('admin', async function () {
-      const fixtures = await setupAvatarTest();
-      const defaultAdminRole = await fixtures.avatar.DEFAULT_ADMIN_ROLE();
-      expect(
-        await fixtures.avatar.hasRole(defaultAdminRole, fixtures.adminRole)
-      ).to.be.true;
-    });
+    describe('admin', function () {
+      it('admin role is set', async function () {
+        const fixtures = await setupAvatarTest();
+        const defaultAdminRole = await fixtures.avatar.DEFAULT_ADMIN_ROLE();
+        expect(
+          await fixtures.avatar.hasRole(defaultAdminRole, fixtures.adminRole)
+        ).to.be.true;
+      });
+      it('admin can set the trusted forwarder', async function () {
+        const fixtures = await setupAvatarTest();
 
+        const avatarAsAdmin = await ethers.getContract(
+          'Avatar',
+          fixtures.adminRole
+        );
+        expect(await fixtures.avatar.getTrustedForwarder()).to.be.equal(
+          fixtures.trustedForwarder
+        );
+        await avatarAsAdmin.setTrustedForwarder(fixtures.other);
+        expect(await fixtures.avatar.getTrustedForwarder()).to.be.equal(
+          fixtures.other
+        );
+      });
+      it('other should fail to set the trusted forwarder', async function () {
+        const fixtures = await setupAvatarTest();
+        await expect(
+          fixtures.avatar.setTrustedForwarder(fixtures.other)
+        ).to.revertedWith('must have admin role');
+      });
+    });
     it('minter', async function () {
       const fixtures = await setupAvatarTest();
       const avatarAsMinter = await ethers.getContract(

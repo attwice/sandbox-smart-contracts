@@ -1,8 +1,8 @@
+// TODO: Validate if we want a L1 avatar contract ?
+
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
-import {skipUnlessTestOrL2} from '../../utils/network';
-import {getContractOrNull} from '@nomiclabs/hardhat-ethers/dist/src/helpers';
-import {AddressZero} from '@ethersproject/constants';
+import {skipUnlessTestnet} from '../../utils/network';
 
 const func: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
@@ -12,11 +12,7 @@ const func: DeployFunction = async function (
   const {deploy} = deployments;
 
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
-  const l1TokenAddress = await getContractOrNull(hre, 'Avatar');
-  if (!l1TokenAddress) {
-    console.warn("We don't have the address of the L1 avatar contract!!!");
-  }
-  await deploy('PolygonAvatar', {
+  await deploy('Avatar', {
     from: deployer,
     proxy: {
       owner: upgradeAdmin,
@@ -24,7 +20,6 @@ const func: DeployFunction = async function (
       execute: {
         methodName: 'initialize',
         args: [
-          (l1TokenAddress && l1TokenAddress.address) || AddressZero,
           'Avatar',
           'TSBAV',
           'http://XXX.YYY',
@@ -38,6 +33,6 @@ const func: DeployFunction = async function (
 };
 
 export default func;
-func.tags = ['PolygonAvatar', 'PolygonAvatar_deploy'];
-func.dependencies = ['Avatar', 'TRUSTED_FORWARDER'];
-func.skip = skipUnlessTestOrL2;
+func.tags = ['Avatar', 'Avatar_deploy'];
+func.dependencies = ['TRUSTED_FORWARDER'];
+func.skip = skipUnlessTestnet;
