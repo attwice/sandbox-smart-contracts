@@ -12,6 +12,7 @@ import {Upgradeable} from "../../../common/BaseWithStorage/Upgradeable.sol";
 contract PolygonAvatar is AvatarBase, Upgradeable {
     event Deposit(address indexed token, address indexed from, uint256 tokenId);
     event Withdraw(address indexed token, address indexed from, uint256 tokenId);
+
     bytes32 public constant CHILD_MANAGER_ROLE = keccak256("CHILD_MANAGER_ROLE");
     address public l1TokenAddress;
 
@@ -32,11 +33,9 @@ contract PolygonAvatar is AvatarBase, Upgradeable {
         l1TokenAddress = l1TokenAddress_;
     }
 
-    /**
-     * @notice Deposit tokens
-     * @param user address for deposit
-     * @param tokenId tokenId to mint to user's account
-     */
+    /// @notice Deposit tokens
+    /// @param user address for deposit
+    ///  @param tokenId tokenId to mint to user's account
     function deposit(address user, uint256 tokenId) public {
         require(hasRole(CHILD_MANAGER_ROLE, _msgSender()), "!CHILD_MANAGER_ROLE");
         require(user != address(0x0), "invalid user");
@@ -44,13 +43,18 @@ contract PolygonAvatar is AvatarBase, Upgradeable {
         emit Deposit(l1TokenAddress, user, tokenId);
     }
 
-    /**
-     * @notice Withdraw tokens
-     * @param tokenId tokenId of the token to be withdrawn
-     */
+    /// @notice Withdraw tokens
+    /// @param tokenId tokenId of the token to be withdrawn
     function withdraw(uint256 tokenId) public payable {
         require(ownerOf(tokenId) == _msgSender(), "Not owner");
         _burn(tokenId);
         emit Withdraw(l1TokenAddress, _msgSender(), tokenId);
+    }
+
+    /// @dev Change layer1 token address
+    /// @param l1TokenAddress_ The new l1TokenAddress
+    function setL1TokenAddress(address l1TokenAddress_) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "must have admin role");
+        l1TokenAddress = l1TokenAddress_;
     }
 }

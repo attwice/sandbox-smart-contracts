@@ -35,10 +35,15 @@ abstract contract AvatarBase is
         baseTokenURI = baseTokenURI_;
     }
 
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     * We must implement supportsInterface here because ERC721Upgradeable is not abstract.
-     */
+    /// @dev Change the address of the trusted forwarder for meta-TX
+    /// @param trustedForwarder_ The new trustedForwarder
+    function setTrustedForwarder(address trustedForwarder_) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "must have admin role");
+        _trustedForwarder = trustedForwarder_;
+    }
+
+    /// @dev See {IERC165-supportsInterface}.
+    /// We must implement supportsInterface here because ERC721Upgradeable is not abstract.
     function supportsInterface(bytes4 interfaceId)
         public
         view
