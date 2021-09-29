@@ -8,16 +8,14 @@ const func: DeployFunction = async function (
 ): Promise<void> {
   const {deployments, getNamedAccounts} = hre;
   const {deployer, upgradeAdmin, sandAdmin} = await getNamedAccounts();
-  const {deploy} = deployments;
 
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
-  const CHILD_CHAIN_MANAGER = await deployments.get('CHILD_CHAIN_MANAGER');
   // TODO: Check if we want a L1 token!!!
   const l1TokenAddress = await hre.companionNetworks['l1'].deployments.get(
     'Avatar'
   ); // layer 1
   const adminRole = sandAdmin;
-  await deploy('PolygonAvatar', {
+  await deployments.deploy('PolygonAvatar', {
     from: deployer,
     log: true,
     skipIfAlreadyDeployed: true,
