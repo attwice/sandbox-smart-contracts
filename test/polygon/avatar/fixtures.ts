@@ -10,7 +10,7 @@ const symbol = 'TSBAV';
 const baseUri = 'http://api';
 export const setupAvatarTest = deployments.createFixture(async function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [l1Token] = await getUnnamedAccounts();
+  const [l1Token, childChainManager] = await getUnnamedAccounts();
   const {deployer, upgradeAdmin} = await getNamedAccounts();
   const [
     trustedForwarder,
@@ -31,8 +31,22 @@ export const setupAvatarTest = deployments.createFixture(async function () {
     },
   });
   const avatar = await ethers.getContract('PolygonAvatar', deployer);
+  // Grant roles.
+  const childChainManagerRole = await deployments.read(
+    'PolygonAvatar',
+    'CHILD_MANAGER_ROLE'
+  );
+  await deployments.execute(
+    'PolygonAvatar',
+    {from: adminRole, log: true},
+    'grantRole',
+    childChainManagerRole,
+    childChainManager
+  );
   return {
     l1Token,
+    childChainManager,
+    childChainManagerRole,
     baseUri,
     symbol,
     name,

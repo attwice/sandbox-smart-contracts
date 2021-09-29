@@ -12,10 +12,12 @@ const func: DeployFunction = async function (
   const {deploy} = deployments;
 
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
+  const CHILD_CHAIN_MANAGER = await deployments.get('CHILD_CHAIN_MANAGER');
   const l1TokenAddress = await getContractOrNull(hre, 'Avatar');
   if (!l1TokenAddress) {
     console.warn("We don't have the address of the L1 avatar contract!!!");
   }
+  const adminRole = sandAdmin;
   await deploy('PolygonAvatar', {
     from: deployer,
     log: true,
@@ -31,15 +33,27 @@ const func: DeployFunction = async function (
           'TSBAV',
           'http://XXX.YYY',
           TRUSTED_FORWARDER.address,
-          sandAdmin,
+          adminRole,
         ],
       },
       upgradeIndex: 0,
     },
   });
+  // Grant roles.
+  const childChainManagerRole = await deployments.read(
+    'PolygonAvatar',
+    'CHILD_MANAGER_ROLE'
+  );
+  await deployments.execute(
+    'PolygonAvatar',
+    {from: adminRole, log: true},
+    'grantRole',
+    childChainManagerRole,
+    CHILD_CHAIN_MANAGER.address
+  );
 };
 
 export default func;
 func.tags = ['PolygonAvatar', 'PolygonAvatar_deploy'];
-func.dependencies = ['Avatar', 'TRUSTED_FORWARDER'];
+func.dependencies = ['Avatar', 'CHILD_CHAIN_MANAGER', 'TRUSTED_FORWARDER'];
 func.skip = skipUnlessTestOrL2;
