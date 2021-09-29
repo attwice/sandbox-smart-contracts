@@ -293,6 +293,9 @@ const config: HardhatUserConfig = {
       tags: ['testnet', 'L2'],
       deploy: ['deploy_polygon'],
       gasPrice: 1000000000, // TODO: this fixes invalid sender issue
+      companionNetworks: {
+        l1: 'goerli',
+      },
     },
     polygon: {
       url: node_url('polygon'),
