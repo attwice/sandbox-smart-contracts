@@ -81,4 +81,7 @@ abstract contract AvatarBase is
         // TODO: we want call the callback for this one _safeMint ?
         _mint(to, id);
     }
+
+    // Just in case.
+    uint256[50] private __gap;
 }
