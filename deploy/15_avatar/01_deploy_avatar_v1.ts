@@ -14,6 +14,8 @@ const func: DeployFunction = async function (
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
   await deploy('Avatar', {
     from: deployer,
+    log: true,
+    skipIfAlreadyDeployed: true,
     proxy: {
       owner: upgradeAdmin,
       proxyContract: 'OptimizedTransparentProxy',

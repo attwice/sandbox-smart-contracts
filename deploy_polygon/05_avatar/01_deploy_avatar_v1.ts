@@ -18,6 +18,8 @@ const func: DeployFunction = async function (
   }
   await deploy('PolygonAvatar', {
     from: deployer,
+    log: true,
+    skipIfAlreadyDeployed: true,
     proxy: {
       owner: upgradeAdmin,
       proxyContract: 'OptimizedTransparentProxy',

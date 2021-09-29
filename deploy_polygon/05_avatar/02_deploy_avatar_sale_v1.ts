@@ -22,6 +22,8 @@ const func: DeployFunction = async function (
   await deploy('PolygonAvatarSale', {
     from: deployer,
     contract: 'AvatarSale',
+    log: true,
+    skipIfAlreadyDeployed: true,
     proxy: {
       owner: upgradeAdmin,
       proxyContract: 'OptimizedTransparentProxy',
