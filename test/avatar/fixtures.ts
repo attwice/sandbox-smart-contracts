@@ -7,7 +7,7 @@ import {
 import {BigNumber, BigNumberish, Contract} from 'ethers';
 import ERC20Mock from '@openzeppelin/contracts-0.8/build/contracts/ERC20PresetMinterPauser.json';
 import {Signature} from '@ethersproject/bytes';
-import {withSnapshot} from '../../utils';
+import {withSnapshot} from '../utils';
 
 const name = 'AVATARNAME';
 const symbol = 'TSBAV';

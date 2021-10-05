@@ -4,11 +4,12 @@ import {
   getNamedAccounts,
   getUnnamedAccounts,
 } from 'hardhat';
+import {withSnapshot} from '../../utils';
 
 const name = 'AVATARNAME';
 const symbol = 'TSBAV';
 const baseUri = 'http://api';
-export const setupAvatarTest = deployments.createFixture(async function () {
+export const setupAvatarTest = withSnapshot([], async function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [l1Token, childChainManager] = await getUnnamedAccounts();
   const {deployer, upgradeAdmin} = await getNamedAccounts();
@@ -30,7 +31,7 @@ export const setupAvatarTest = deployments.createFixture(async function () {
       },
     },
   });
-  const avatar = await ethers.getContract('PolygonAvatar', deployer);
+  const polygonAvatar = await ethers.getContract('PolygonAvatar', deployer);
   // Grant roles.
   const childChainManagerRole = await deployments.read(
     'PolygonAvatar',
@@ -50,7 +51,7 @@ export const setupAvatarTest = deployments.createFixture(async function () {
     baseUri,
     symbol,
     name,
-    avatar,
+    polygonAvatar,
     deployer,
     upgradeAdmin,
     trustedForwarder,

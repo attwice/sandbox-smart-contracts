@@ -2,10 +2,8 @@ import {ethers} from 'hardhat';
 import {expect} from 'chai';
 import {solidityPack} from 'ethers/lib/utils';
 import {addMinter, setupAvatarTest} from './fixtures';
-import {cleanTestingEnvironment} from '../utils';
 
 describe('Avatar.sol', function () {
-  before(cleanTestingEnvironment);
   describe('initialization', function () {
     it('creation', async function () {
       const fixtures = await setupAvatarTest();

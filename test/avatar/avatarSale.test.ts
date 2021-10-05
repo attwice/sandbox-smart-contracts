@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import {solidityPack} from 'ethers/lib/utils';
 import {mintSandAndApprove, setupAvatarSaleTest, signMint} from './fixtures';
 import {BigNumber} from 'ethers';
-import {toWei} from '../../utils';
+import {toWei} from '../utils';
 
 describe('AvatarSale.sol', function () {
   describe('initialization', function () {

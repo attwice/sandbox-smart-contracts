@@ -76,10 +76,17 @@ abstract contract AvatarBase is
      *
      * - the caller must have the `MINTER_ROLE`.
      */
-    function mint(address to, uint256 id) external override {
+    function mint(address to, uint256 id) external virtual override {
         require(hasRole(MINTER_ROLE, _msgSender()), "must have minter role");
         // TODO: we want call the callback for this one _safeMint ?
         _mint(to, id);
+    }
+
+    /**
+     * @dev We don't implement {IMintableERC721-exists} but this one is a nice to have.
+     */
+    function exists(uint256 tokenId) external view returns (bool) {
+        return _exists(tokenId);
     }
 
     // Just in case.
