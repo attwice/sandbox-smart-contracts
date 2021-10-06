@@ -61,7 +61,10 @@ describe('PolygonAvatar.sol differences with Avatar.sol', function () {
           'PolygonAvatar',
           fixtures.childChainManager
         );
-        await avatarAsChildChainManager.deposit(fixtures.other, tokenId);
+        await avatarAsChildChainManager['deposit(address,uint256)'](
+          fixtures.other,
+          tokenId
+        );
         expect(await fixtures.polygonAvatar.ownerOf(tokenId)).to.be.equal(
           fixtures.other
         );
@@ -70,7 +73,10 @@ describe('PolygonAvatar.sol differences with Avatar.sol', function () {
         const tokenId = BigNumber.from('0xdada2');
         const fixtures = await setupAvatarTest();
         await expect(
-          fixtures.polygonAvatar.deposit(fixtures.other, tokenId)
+          fixtures.polygonAvatar['deposit(address,uint256)'](
+            fixtures.other,
+            tokenId
+          )
         ).to.revertedWith('!CHILD_MANAGER_ROLE');
       });
       it('users can burn tokens', async function () {
@@ -80,7 +86,10 @@ describe('PolygonAvatar.sol differences with Avatar.sol', function () {
           'PolygonAvatar',
           fixtures.childChainManager
         );
-        await avatarAsChildChainManager.deposit(fixtures.other, tokenId);
+        await avatarAsChildChainManager['deposit(address,uint256)'](
+          fixtures.other,
+          tokenId
+        );
         expect(await fixtures.polygonAvatar.ownerOf(tokenId)).to.be.equal(
           fixtures.other
         );
@@ -101,7 +110,10 @@ describe('PolygonAvatar.sol differences with Avatar.sol', function () {
           'PolygonAvatar',
           fixtures.childChainManager
         );
-        await avatarAsChildChainManager.deposit(fixtures.other, tokenId);
+        await avatarAsChildChainManager['deposit(address,uint256)'](
+          fixtures.other,
+          tokenId
+        );
         await expect(fixtures.polygonAvatar.withdraw(tokenId)).to.revertedWith(
           'Not owner'
         );
