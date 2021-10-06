@@ -10,12 +10,8 @@ const func: DeployFunction = async function (
   const {deployments, getNamedAccounts} = hre;
   const {
     sandAdmin,
-    backendAuthWallet,
-    sandboxAccount,
     PolygonMintableERC721PredicateProxy,
   } = await getNamedAccounts();
-
-  const avatarSaleContract = await deployments.get('AvatarSale');
   const adminRole = sandAdmin;
 
   // Grant roles.

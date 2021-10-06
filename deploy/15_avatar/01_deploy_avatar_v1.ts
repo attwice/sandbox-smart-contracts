@@ -11,6 +11,7 @@ const func: DeployFunction = async function (
   const {deployer, upgradeAdmin, sandAdmin} = await getNamedAccounts();
 
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
+  const adminRole = sandAdmin;
   await deployments.deploy('Avatar', {
     from: deployer,
     log: true,
@@ -25,7 +26,7 @@ const func: DeployFunction = async function (
           'TSBAV',
           'http://XXX.YYY',
           TRUSTED_FORWARDER.address,
-          sandAdmin,
+          adminRole,
         ],
       },
       upgradeIndex: 0,

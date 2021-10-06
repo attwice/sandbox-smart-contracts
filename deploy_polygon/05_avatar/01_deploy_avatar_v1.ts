@@ -10,7 +10,6 @@ const func: DeployFunction = async function (
   const {deployer, upgradeAdmin, sandAdmin} = await getNamedAccounts();
 
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
-  // TODO: Check if we want a L1 token!!!
   const l1TokenAddress = await hre.companionNetworks['l1'].deployments.get(
     'Avatar'
   ); // layer 1
@@ -40,5 +39,5 @@ const func: DeployFunction = async function (
 
 export default func;
 func.tags = ['PolygonAvatar', 'PolygonAvatar_deploy'];
-func.dependencies = ['CHILD_CHAIN_MANAGER', 'TRUSTED_FORWARDER'];
+func.dependencies = ['TRUSTED_FORWARDER'];
 func.skip = skipUnlessTestnet;
