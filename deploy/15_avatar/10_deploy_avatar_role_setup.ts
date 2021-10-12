@@ -1,9 +1,8 @@
-// TODO: Validate if we want a L1 avatar sale contract ?
-
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {skipUnlessTestnet} from '../../utils/network';
 
+// Avatars can be only minted in L2, when moved to L1 the polygon predicate is in charge of minting them.
 const func: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ): Promise<void> {

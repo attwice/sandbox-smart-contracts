@@ -137,21 +137,18 @@ const config: HardhatUserConfig = {
     },
     PolygonMintableERC20PredicateProxy: {
       default: 8,
-      mainnet: 0x9923263fa127b3d1484cfd649df8f1831c2a74e4,
-      goerli: 0x37c3bfc05d5ebf9ebb3ff80ce0bd0133bf221bc8,
+      mainnet: '0x9923263fa127b3d1484cfd649df8f1831c2a74e4',
+      goerli: '0x37c3bfc05d5ebf9ebb3ff80ce0bd0133bf221bc8',
     },
     PolygonMintableERC721PredicateProxy: {
       default: 9,
-      mainnet: 0x932532aa4c0174b8453839a6e44ee09cc615f2b7,
-      goerli: 0x56e14c4c1748a818a5564d33cf774c59eb3edf59,
+      mainnet: '0x932532aa4c0174b8453839a6e44ee09cc615f2b7',
+      goerli: '0x56e14c4c1748a818a5564d33cf774c59eb3edf59',
     },
     PolygonMintableERC1155PredicateProxy: {
       default: 10,
-      mainnet: 0x2d641867411650cd05db93b59964536b1ed5b1b7,
-      goerli: 0x72d6066f486bd0052eefb9114b66ae40e0a6031a,
-    },
-    PolygonChildChainManagerProxy: {
-      mumbai: 0xb5505a6d998549090530911180f38ac5130101c6,
+      mainnet: '0x2d641867411650cd05db93b59964536b1ed5b1b7',
+      goerli: '0x72d6066f486bd0052eefb9114b66ae40e0a6031a',
     },
     Foundation: {
       default: 5,

@@ -1,7 +1,6 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {skipUnlessTestnet} from '../../utils/network';
-import {AddressZero} from '@ethersproject/constants';
 
 const func: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
@@ -10,9 +9,6 @@ const func: DeployFunction = async function (
   const {deployer, upgradeAdmin, sandAdmin} = await getNamedAccounts();
 
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
-  const l1TokenAddress = await hre.companionNetworks['l1'].deployments.get(
-    'Avatar'
-  ); // layer 1
   const adminRole = sandAdmin;
   await deployments.deploy('PolygonAvatar', {
     from: deployer,
@@ -24,7 +20,6 @@ const func: DeployFunction = async function (
       execute: {
         methodName: 'initialize',
         args: [
-          (l1TokenAddress && l1TokenAddress.address) || AddressZero,
           'Avatar',
           'TSBAV',
           'http://XXX.YYY',

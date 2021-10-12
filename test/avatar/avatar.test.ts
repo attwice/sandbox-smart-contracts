@@ -58,33 +58,79 @@ describe('Avatar.sol', function () {
         ).to.revertedWith('must have admin role');
       });
     });
-    it('minter', async function () {
-      const fixtures = await setupAvatarTest();
-      const avatarAsMinter = await ethers.getContract(
-        'Avatar',
-        fixtures.minter
-      );
-      await expect(avatarAsMinter.mint(fixtures.other, 123)).to.revertedWith(
-        'must have minter role'
-      );
-      await expect(fixtures.avatar.mint(fixtures.other, 123)).to.revertedWith(
-        'must have minter role'
-      );
+    describe('minter', function () {
+      it('mint', async function () {
+        const fixtures = await setupAvatarTest();
+        const avatarAsMinter = await ethers.getContract(
+          'Avatar',
+          fixtures.minter
+        );
+        await expect(
+          avatarAsMinter['mint(address,uint256)'](fixtures.other, 123)
+        ).to.revertedWith('must have minter role');
+        await expect(
+          fixtures.avatar['mint(address,uint256)'](fixtures.other, 123)
+        ).to.revertedWith('must have minter role');
 
-      await addMinter(fixtures.adminRole, fixtures.avatar, fixtures.minter);
-      const minterRole = await fixtures.avatar.MINTER_ROLE();
-      expect(await fixtures.avatar.hasRole(minterRole, fixtures.minter)).to.be
-        .true;
-      await expect(fixtures.avatar.ownerOf(123)).to.revertedWith(
-        'ERC721: owner query for nonexistent token'
-      );
-      await avatarAsMinter.mint(fixtures.other, 123);
-      expect(await fixtures.avatar.ownerOf(123)).to.be.equal(fixtures.other);
-      await expect(avatarAsMinter.mint(fixtures.other, 123)).to.revertedWith(
-        'ERC721: token already minted'
-      );
+        await addMinter(fixtures.adminRole, fixtures.avatar, fixtures.minter);
+        const minterRole = await fixtures.avatar.MINTER_ROLE();
+        expect(await fixtures.avatar.hasRole(minterRole, fixtures.minter)).to.be
+          .true;
+        await expect(fixtures.avatar.ownerOf(123)).to.revertedWith(
+          'ERC721: owner query for nonexistent token'
+        );
+        await avatarAsMinter['mint(address,uint256)'](fixtures.other, 123);
+        expect(await fixtures.avatar.ownerOf(123)).to.be.equal(fixtures.other);
+        expect(await fixtures.avatar.exists(123)).to.be.true;
+        await expect(
+          avatarAsMinter['mint(address,uint256)'](fixtures.other, 123)
+        ).to.revertedWith('ERC721: token already minted');
+      });
+      it('mint with metadata', async function () {
+        const fixtures = await setupAvatarTest();
+        const metadata = ethers.utils.toUtf8Bytes('metadata');
+        const avatarAsMinter = await ethers.getContract(
+          'Avatar',
+          fixtures.minter
+        );
+        await expect(
+          avatarAsMinter['mint(address,uint256,bytes)'](
+            fixtures.other,
+            123,
+            metadata
+          )
+        ).to.revertedWith('must have minter role');
+        await expect(
+          fixtures.avatar['mint(address,uint256,bytes)'](
+            fixtures.other,
+            123,
+            metadata
+          )
+        ).to.revertedWith('must have minter role');
+
+        await addMinter(fixtures.adminRole, fixtures.avatar, fixtures.minter);
+        const minterRole = await fixtures.avatar.MINTER_ROLE();
+        expect(await fixtures.avatar.hasRole(minterRole, fixtures.minter)).to.be
+          .true;
+        await expect(fixtures.avatar.ownerOf(123)).to.revertedWith(
+          'ERC721: owner query for nonexistent token'
+        );
+        await avatarAsMinter['mint(address,uint256,bytes)'](
+          fixtures.other,
+          123,
+          metadata
+        );
+        expect(await fixtures.avatar.ownerOf(123)).to.be.equal(fixtures.other);
+        expect(await fixtures.avatar.exists(123)).to.be.true;
+        await expect(
+          avatarAsMinter['mint(address,uint256,bytes)'](
+            fixtures.other,
+            123,
+            metadata
+          )
+        ).to.revertedWith('ERC721: token already minted');
+      });
     });
-
     it('metaTX trusted forwarder', async function () {
       const fixtures = await setupAvatarTest();
       await addMinter(fixtures.adminRole, fixtures.avatar, fixtures.minter);
@@ -93,14 +139,14 @@ describe('Avatar.sol', function () {
         'Avatar',
         fixtures.minter
       );
-      await avatarAsMinter.mint(fixtures.other, 123);
+      await avatarAsMinter['mint(address,uint256)'](fixtures.other, 123);
       expect(await fixtures.avatar.ownerOf(123)).to.be.equal(fixtures.other);
       const avatarAsOther = await ethers.getContract('Avatar', fixtures.other);
       await avatarAsOther.transferFrom(fixtures.other, fixtures.dest, 123);
       expect(await fixtures.avatar.ownerOf(123)).to.be.equal(fixtures.dest);
 
       // MetaTX transfer
-      await avatarAsMinter.mint(fixtures.other, 124);
+      await avatarAsMinter['mint(address,uint256)'](fixtures.other, 124);
       expect(await fixtures.avatar.ownerOf(124)).to.be.equal(fixtures.other);
       const avatarAsTrustedForwarder = await ethers.getContract(
         'Avatar',
