@@ -12,7 +12,6 @@ const func: DeployFunction = async function (
     sandboxAccount,
   } = await getNamedAccounts();
 
-  const avatarContract = await deployments.get('PolygonAvatar');
   const avatarSaleContract = await deployments.get('PolygonAvatarSale');
   const adminRole = sandAdmin;
 

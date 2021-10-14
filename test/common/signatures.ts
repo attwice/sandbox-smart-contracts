@@ -56,7 +56,7 @@ export const avatarSaleSignature = async function (
       seller: seller,
       price: price.toString(),
     },
-  } as any;
+  } as never;
 
   let signature;
   if (privateKey) {

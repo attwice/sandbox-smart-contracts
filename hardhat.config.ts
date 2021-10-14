@@ -244,7 +244,6 @@ const config: HardhatUserConfig = {
      *  - L2      -> Layer 2 networks
      */
     hardhat: {
-      saveDeployments: false,
       accounts: accounts(process.env.HARDHAT_FORK),
       tags: ['testnet', 'L1', 'L2'],
       forking: process.env.HARDHAT_FORK
@@ -263,13 +262,11 @@ const config: HardhatUserConfig = {
       // deploy: ['deploy-for-test', 'deploy'],
     },
     localhost: {
-      saveDeployments: false,
       url: 'http://localhost:8545',
       accounts: accounts(),
       tags: ['testnet', 'L1', 'L2'],
     },
     rinkeby_test: {
-      saveDeployments: false,
       url: node_url('rinkeby'),
       accounts: accounts('rinkeby_test'),
       tags: ['testnet'],
