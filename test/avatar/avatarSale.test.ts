@@ -1,9 +1,10 @@
 import {ethers} from 'hardhat';
 import {expect} from 'chai';
 import {solidityPack} from 'ethers/lib/utils';
-import {mintSandAndApprove, setupAvatarSaleTest, signMint} from './fixtures';
+import {mintSandAndApprove, setupAvatarSaleTest} from './fixtures';
 import {BigNumber} from 'ethers';
 import {toWei} from '../utils';
+import {avatarSaleSignature} from '../common/signatures';
 
 describe('AvatarSale.sol', function () {
   describe('initialization', function () {
@@ -62,7 +63,7 @@ describe('AvatarSale.sol', function () {
       const preBuyer = BigNumber.from(
         await fixtures.sandToken.balanceOf(buyer)
       );
-      const {v, r, s} = await signMint(
+      const {v, r, s} = await avatarSaleSignature(
         fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,
@@ -93,7 +94,7 @@ describe('AvatarSale.sol', function () {
       const buyer = fixtures.dest;
       const tokenId = BigNumber.from(0x123);
       const price = toWei(5);
-      const {v, r, s} = await signMint(
+      const {v, r, s} = await avatarSaleSignature(
         fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,
@@ -119,7 +120,7 @@ describe('AvatarSale.sol', function () {
       const buyer = fixtures.dest;
       const tokenId = BigNumber.from(0x123);
       const price = toWei(5);
-      const {v, r, s} = await signMint(
+      const {v, r, s} = await avatarSaleSignature(
         fixtures.avatarSaleAsOther,
         fixtures.other,
         buyer,
@@ -145,7 +146,7 @@ describe('AvatarSale.sol', function () {
       const buyer = fixtures.dest;
       const tokenId = BigNumber.from(0x123);
       const price = toWei(5);
-      const {v, r, s} = await signMint(
+      const {v, r, s} = await avatarSaleSignature(
         fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,
@@ -184,7 +185,7 @@ describe('AvatarSale.sol', function () {
       const preBuyer = BigNumber.from(
         await fixtures.sandToken.balanceOf(buyer)
       );
-      const {v, r, s} = await signMint(
+      const {v, r, s} = await avatarSaleSignature(
         fixtures.avatarSaleAsOther,
         fixtures.signer,
         buyer,

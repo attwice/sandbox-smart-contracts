@@ -5,6 +5,7 @@ pragma solidity 0.8.2;
 
 interface IMintableERC721 {
     // is IERC721 {
+
     /**
      * @notice called by predicate contract to mint tokens while withdrawing
      * @dev Should be callable only by MintableERC721Predicate
@@ -37,4 +38,11 @@ interface IMintableERC721 {
      * @param tokenId tokenId being checked
      */
     function exists(uint256 tokenId) external view returns (bool);
+
+    // This one came form ERC721 and is used by the predicate!!!
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external;
 }

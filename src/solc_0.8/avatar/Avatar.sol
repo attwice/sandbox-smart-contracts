@@ -6,6 +6,7 @@ import {AvatarBase} from "./AvatarBase.sol";
 import {IAvatarMinter} from "../common/interfaces/IAvatarMinter.sol";
 import {Upgradeable} from "../common/BaseWithStorage/Upgradeable.sol";
 import {IMintableERC721} from "../common/interfaces/@maticnetwork/pos-portal/root/RootToken/IMintableERC721.sol";
+import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 /// @title This contract is a erc 721 compatible NFT token that represents an avatar and can be minted by a minter role.
 /// @dev This contract support meta transactions.
@@ -65,5 +66,13 @@ contract Avatar is AvatarBase, Upgradeable, IMintableERC721 {
      */
     function exists(uint256 tokenId) external view override returns (bool) {
         return _exists(tokenId);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721Upgradeable, IMintableERC721) {
+        ERC721Upgradeable.safeTransferFrom(from, to, tokenId);
     }
 }

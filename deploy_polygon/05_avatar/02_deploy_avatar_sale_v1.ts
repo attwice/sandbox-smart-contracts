@@ -8,7 +8,7 @@ const func: DeployFunction = async function (
   const {deployments, getNamedAccounts} = hre;
   const {deployer, upgradeAdmin, sandAdmin} = await getNamedAccounts();
   const avatarContract = await deployments.get('PolygonAvatar');
-  const sandContract = await deployments.get('Sand');
+  const sandContract = await deployments.get('PolygonSand');
   const TRUSTED_FORWARDER = await deployments.get('TRUSTED_FORWARDER');
   const adminRole = sandAdmin;
   await deployments.deploy('PolygonAvatarSale', {
@@ -38,6 +38,6 @@ func.tags = ['PolygonAvatarSale', 'PolygonAvatarSale_deploy'];
 func.dependencies = [
   'TRUSTED_FORWARDER',
   'PolygonAvatar_deploy',
-  'Sand_deploy',
+  'PolygonSand_deploy',
 ];
 func.skip = skipUnlessTestnet;

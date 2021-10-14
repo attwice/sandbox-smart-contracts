@@ -65,7 +65,7 @@ contract PolygonAvatar is AvatarBase, Upgradeable, IChildToken {
 
     /// @notice Withdraw tokens
     /// @param tokenId tokenId of the token to be withdrawn
-    function withdraw(uint256 tokenId) public payable {
+    function withdraw(uint256 tokenId) public {
         _withdraw(tokenId);
     }
 

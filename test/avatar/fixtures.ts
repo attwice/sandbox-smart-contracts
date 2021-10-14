@@ -4,9 +4,8 @@ import {
   getNamedAccounts,
   getUnnamedAccounts,
 } from 'hardhat';
-import {BigNumber, BigNumberish, Contract} from 'ethers';
+import {BigNumberish, Contract} from 'ethers';
 import ERC20Mock from '@openzeppelin/contracts-0.8/build/contracts/ERC20PresetMinterPauser.json';
-import {Signature} from '@ethersproject/bytes';
 import {withSnapshot} from '../utils';
 
 const name = 'AVATARNAME';
@@ -141,63 +140,4 @@ export const mintSandAndApprove = async function (
   await sandToken.mint(addr, amount);
   const sandTokenAsOther = await ethers.getContract('SandMock', addr);
   await sandTokenAsOther.approve(spender, amount);
-};
-
-export const signMint = async function (
-  avatarSale: Contract,
-  signer: string,
-  buyer: string,
-  tokenId: BigNumberish,
-  seller: string,
-  price: BigNumberish
-): Promise<Signature> {
-  const chainId = BigNumber.from(await avatarSale.getChainId());
-  const signature = await ethers.provider.send('eth_signTypedData_v4', [
-    signer,
-    {
-      types: {
-        EIP712Domain: [
-          {
-            name: 'name',
-            type: 'string',
-          },
-          {
-            name: 'version',
-            type: 'string',
-          },
-          {
-            name: 'chainId',
-            type: 'uint256',
-          },
-          {
-            name: 'verifyingContract',
-            type: 'address',
-          },
-        ],
-        // Mint(address signer,address buyer,uint id,address seller,uint price)
-        Mint: [
-          {name: 'signer', type: 'address'},
-          {name: 'buyer', type: 'address'},
-          {name: 'id', type: 'uint256'},
-          {name: 'seller', type: 'address'},
-          {name: 'price', type: 'uint256'},
-        ],
-      },
-      primaryType: 'Mint',
-      domain: {
-        name: 'Sandbox Avatar Sale',
-        version: '1.0',
-        chainId: chainId.toString(),
-        verifyingContract: avatarSale.address,
-      },
-      message: {
-        signer: signer,
-        buyer: buyer,
-        id: tokenId.toString(),
-        seller: seller,
-        price: price.toString(),
-      },
-    },
-  ]);
-  return ethers.utils.splitSignature(signature);
 };

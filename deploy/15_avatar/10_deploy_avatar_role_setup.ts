@@ -7,11 +7,10 @@ const func: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ): Promise<void> {
   const {deployments, getNamedAccounts} = hre;
-  const {
-    sandAdmin,
-    PolygonMintableERC721PredicateProxy,
-  } = await getNamedAccounts();
+  const {sandAdmin} = await getNamedAccounts();
   const adminRole = sandAdmin;
+
+  const predicate = await deployments.get('MINTABLE_ERC721_PREDICATE');
 
   // Grant roles.
   const minterRole = await deployments.read('Avatar', 'MINTER_ROLE');
@@ -20,11 +19,11 @@ const func: DeployFunction = async function (
     {from: adminRole, log: true},
     'grantRole',
     minterRole,
-    PolygonMintableERC721PredicateProxy
+    predicate.address
   );
 };
 
 export default func;
 func.tags = ['Avatar', 'Avatar_setup'];
-func.dependencies = ['Avatar_deploy'];
+func.dependencies = ['Avatar_deploy', 'MINTABLE_ERC721_PREDICATE'];
 func.skip = skipUnlessTestnet;
