@@ -56,6 +56,7 @@ const deployAvatar = withSnapshot(
     };
   }
 );
+
 describe('PolygonAvatar - Avatar deployment test', function () {
   describe('roles', function () {
     before(async function () {
@@ -239,6 +240,30 @@ describe('PolygonAvatar - Avatar deployment test', function () {
       );
       expect(await this.l2.avatar.ownerOf(this.tokenId)).to.be.equal(
         this.buyer
+      );
+    });
+    it('Now if we withdraw to L1 instead of minting the predicate will do a transfer', async function () {
+      await expect(this.polygonAvatarAsBuyer.withdraw(this.tokenId))
+        .to.emit(this.polygonAvatarAsBuyer, 'Transfer')
+        .withArgs(this.buyer, AddressZero, this.tokenId);
+
+      // Locked in L1
+      expect(await this.l1.avatar.ownerOf(this.tokenId)).to.be.equal(
+        this.l1.mintableERC721Predicate.address
+      );
+      await expect(this.l2.avatar.ownerOf(this.tokenId)).to.revertedWith(
+        'ERC721: owner query for nonexistent token'
+      );
+
+      await this.l1.mintableERC721Predicate[
+        'exitTokens(address,address,uint256)'
+      ](this.l1.avatar.address, this.buyer, this.tokenId);
+
+      expect(await this.l1.avatar.ownerOf(this.tokenId)).to.be.equal(
+        this.buyer
+      );
+      await expect(this.l2.avatar.ownerOf(this.tokenId)).to.revertedWith(
+        'ERC721: owner query for nonexistent token'
       );
     });
   });
