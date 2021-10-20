@@ -8,6 +8,7 @@ import 'solidity-coverage';
 import 'hardhat-contract-sizer';
 import '@nomiclabs/hardhat-etherscan';
 import {accounts, node_url} from './utils/network';
+import {MochaOptions} from 'mocha';
 
 const config: HardhatUserConfig = {
   gasReporter: {
@@ -19,7 +20,9 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 0,
-  },
+    grep: process.env.TEST_GREP ? process.env.TEST_GREP : '@e2e',
+    invert: !process.env.TEST_GREP, // exclude @e2e if nothing is selected
+  } as MochaOptions,
   solidity: {
     compilers: [
       {
@@ -280,6 +283,9 @@ const config: HardhatUserConfig = {
       url: node_url('goerli'),
       accounts: accounts('goerli'),
       tags: ['testnet', 'L1'],
+      companionNetworks: {
+        l2: 'mumbai',
+      },
       // gasPrice: 600000000000, // Uncomment in case of pending txs, and adjust gas
     },
     mainnet: {
