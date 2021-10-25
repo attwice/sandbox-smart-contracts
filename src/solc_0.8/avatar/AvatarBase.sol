@@ -21,13 +21,6 @@ abstract contract AvatarBase is
 {
     string public baseTokenURI;
 
-    function __AvatarBase_init(address adminRole, string memory baseTokenURI_) internal initializer {
-        __Context_init_unchained();
-        __ERC165_init_unchained();
-        __AccessControl_init_unchained();
-        __AvatarBase_init_unchained(adminRole, baseTokenURI_);
-    }
-
     function __AvatarBase_init_unchained(address adminRole, string memory baseTokenURI_) internal initializer {
         _setupRole(DEFAULT_ADMIN_ROLE, adminRole);
         baseTokenURI = baseTokenURI_;
@@ -38,6 +31,13 @@ abstract contract AvatarBase is
     function setTrustedForwarder(address trustedForwarder_) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "must have admin role");
         _trustedForwarder = trustedForwarder_;
+    }
+
+    /// @dev Change the base url for token metadata
+    /// @param baseUri_ The new base Url.
+    function setBaseUrl(string calldata baseUri_) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "must have admin role");
+        baseTokenURI = baseUri_;
     }
 
     /// @dev See {IERC165-supportsInterface}.

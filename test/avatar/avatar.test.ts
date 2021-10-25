@@ -57,6 +57,26 @@ describe('Avatar.sol', function () {
           fixtures.avatar.setTrustedForwarder(fixtures.other)
         ).to.revertedWith('must have admin role');
       });
+      it('admin can set the base Url', async function () {
+        const fixtures = await setupAvatarTest();
+
+        const avatarAsAdmin = await ethers.getContract(
+          'Avatar',
+          fixtures.adminRole
+        );
+        expect(await fixtures.avatar.baseTokenURI()).to.be.equal(
+          fixtures.baseUri
+        );
+        const otherUri = 'http://somethingelse';
+        await avatarAsAdmin.setBaseUrl(otherUri);
+        expect(await fixtures.avatar.baseTokenURI()).to.be.equal(otherUri);
+      });
+      it('other should fail to set the base Url', async function () {
+        const fixtures = await setupAvatarTest();
+        await expect(fixtures.avatar.setBaseUrl('test')).to.revertedWith(
+          'must have admin role'
+        );
+      });
     });
     describe('minter', function () {
       it('mint', async function () {
