@@ -1,15 +1,12 @@
 import {BigNumber} from 'ethers';
 import {toWei} from '../../test/utils';
 import {avatarSaleSignature} from '../../test/common/signatures';
-import hre, {ethers, getNamedAccounts} from 'hardhat';
+import {ethers, getNamedAccounts} from 'hardhat';
 import {getArgParser} from '../utils/utils';
+import {ifNotMumbaiThrow} from '../utils/matic';
 
 async function main() {
-  if (hre.network.name !== 'mumbai') {
-    throw new Error(
-      `This script must be run on mumbai, invalid network ${hre.network.name}`
-    );
-  }
+  ifNotMumbaiThrow();
 
   const backendPk = process.env.BACKEND_PK;
   if (!backendPk) {

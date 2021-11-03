@@ -268,6 +268,19 @@ const config: HardhatUserConfig = {
       url: 'http://localhost:8545',
       accounts: accounts(),
       tags: ['testnet', 'L1', 'L2'],
+      companionNetworks: {
+        l1: 'localL1',
+        l2: 'localhost',
+      },
+    },
+    localL1: {
+      url: 'http://localhost:8546',
+      accounts: accounts(),
+      tags: ['testnet', 'L1', 'L2'],
+      companionNetworks: {
+        l1: 'localL1',
+        l2: 'localhost',
+      },
     },
     rinkeby_test: {
       url: node_url('rinkeby'),

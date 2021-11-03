@@ -1,12 +1,9 @@
-import hre, {ethers, getNamedAccounts} from 'hardhat';
+import {ethers, getNamedAccounts} from 'hardhat';
 import {getArgParser} from '../utils/utils';
+import {ifNotMumbaiThrow} from '../utils/matic';
 
 async function main() {
-  if (hre.network.name !== 'mumbai') {
-    throw new Error(
-      `This script must be run on mumbai, invalid network ${hre.network.name}`
-    );
-  }
+  ifNotMumbaiThrow();
 
   const parser = getArgParser({
     description: `RUN WITH: yarn execute mumbai ${process.argv[0]}`,

@@ -1,13 +1,11 @@
-import hre, {ethers} from 'hardhat';
+import {ethers} from 'hardhat';
 import {getArgParser} from '../utils/utils';
 import {BigNumber} from 'ethers';
+import {ifNotMumbaiThrow} from '../utils/matic';
 
 async function main() {
-  if (hre.network.name !== 'mumbai') {
-    throw new Error(
-      `This script must be run on mumbai, invalid network ${hre.network.name}`
-    );
-  }
+  ifNotMumbaiThrow();
+
   const pk = process.env.USER_PK;
   if (!pk) {
     throw new Error(`Set the env var USER_PK`);
