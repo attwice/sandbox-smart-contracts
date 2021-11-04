@@ -92,7 +92,7 @@ contract AvatarSale is
         uint256 id,
         address seller,
         uint256 price
-    ) external payable {
+    ) external {
         require(_verify(v, r, s, signer, buyer, id, seller, price), "Invalid signature");
         require(hasRole(SIGNER_ROLE, signer), "Invalid signer");
         require(hasRole(SELLER_ROLE, seller), "Invalid seller");
