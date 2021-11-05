@@ -2,7 +2,7 @@ import hre from 'hardhat';
 import {expect} from 'chai';
 import {getAvatarContracts} from '../common/fixtures/avatar';
 
-describe('@e2e @l1 Avatar', function () {
+describe('@skip-on-coverage @e2e @l1 Avatar', function () {
   describe('roles', function () {
     before(async function () {
       const {l1, buyer} = await getAvatarContracts(

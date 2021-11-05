@@ -2,7 +2,7 @@ import hre, {deployments} from 'hardhat';
 import {expect} from 'chai';
 import {getAvatarContracts} from '../../common/fixtures/avatar';
 
-describe('@e2e @l2 polygon Avatar', function () {
+describe('@skip-on-coverage @e2e @l2 polygon Avatar', function () {
   before(async function () {
     const {l2, buyer} = await getAvatarContracts(
       hre.companionNetworks['l1'],
