@@ -92,7 +92,6 @@ describe('SandRewardPool', function () {
   it('last time reward application should match the duration', async function () {
     const {
       rewardCalculator,
-      rewardPoolContract,
       liquidityRewardAdmin,
       REWARD_AMOUNT,
       rewardTokenAsAdmin,
@@ -437,7 +436,6 @@ describe('SandRewardPool', function () {
   it('admin can notify to start a new reward process (without sending more reward tokens)', async function () {
     const {
       rewardCalculator,
-      rewardPoolContract,
       liquidityRewardAdmin,
       NEW_REWARD_AMOUNT,
     } = await setupSandRewardPool();
